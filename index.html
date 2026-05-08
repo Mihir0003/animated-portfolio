@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mihir Amodwala - Animated Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="blob background-blob-1"></div>
+    <div class="blob background-blob-2"></div>
+
+    <nav class="glass-nav anim-fade-in-down">
+        <div class="logo">Mihir Amodwala.</div>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#experience">Experience & Education</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <header id="hero" class="section hero">
+        <div class="hero-content">
+            <span class="badge anim-slide-up" style="--delay: 0.1s">Information Technology Student (B.Tech 2026)</span>
+            <h1 class="anim-slide-up" style="--delay: 0.3s">Hi, I'm <span class="gradient-text">Mihir Amodwala</span></h1>
+            <p class="anim-slide-up" style="--delay: 0.5s">I am a developer with a strong foundation in software development, certified in Advance Java, and skilled in Python, MySQL, web design, and data visualization. Welcome to my creative portfolio.</p>
+            <div class="hero-buttons anim-slide-up" style="--delay: 0.7s">
+                <a href="#experience" class="btn primary-btn">Explore My Journey</a>
+                <a href="#contact" class="btn secondary-btn">Contact Me</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="experience" class="section experience">
+        <div class="section-header scroll-anim">
+            <h2>Experience & <span class="gradient-text">Education</span></h2>
+            <p>A timeline of my academic and professional growth</p>
+        </div>
+
+        <div class="timeline">
+            <!-- Internship Experience -->
+            <div class="timeline-item scroll-anim" style="--scroll-delay: 0.1s">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <span class="date">Jan 2026 – Mar 2026</span>
+                    <h3>Digital Team Intern</h3>
+                    <h4>Jio-bp (Reliance BP Mobility Limited)</h4>
+                    <p><strong>Project: AFS NOC Platform Technical Upgradation.</strong> Designed and implemented a metadata-driven dynamic form system from scratch.</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; color: var(--text-secondary); font-size: 1rem;">
+                        <li><strong>Advanced Spring Boot:</strong> Built robust layered architectures (Controller, Service, Repository) using best practices like DTO pattern, separation of concerns, and clean API design.</li>
+                        <li><strong>Dynamic Forms & APIs:</strong> Engineered a system mapping parent/child dynamic UI forms to normalized database structures (MySQL), building scalable APIs for rendering and submissions.</li>
+                        <li><strong>SQL & Database:</strong> Set up transaction-based form tracking and optimized SQL schema utilizing complex relationships and SSMS query development.</li>
+                        <li><strong>Optimization:</strong> Enhanced repository methods via Spring Data JPA and restructured backend systems for future-proof Flutter integrations.</li>
+                    </ul>
+                    <div class="tags">
+                        <span class="tag">Java Spring Boot</span>
+                        <span class="tag">MySQL</span>
+                        <span class="tag">REST APIs</span>
+                        <span class="tag">System Design</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- B.Tech Degree -->
+            <div class="timeline-item scroll-anim" style="--scroll-delay: 0.3s">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <span class="date">2023 – 2026</span>
+                    <h3>B.Tech. Lateral – Information Technology</h3>
+                    <h4>Parul University (PIET)</h4>
+                    <p>Pursuing an advanced degree in IT, focusing on software development and enterprise technologies. Current CGPA: 7.87/10.</p>
+                    <div class="tags">
+                        <span class="tag">Advance Java Certification</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">Data Visualization</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diploma Degree -->
+            <div class="timeline-item scroll-anim" style="--scroll-delay: 0.5s">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content glass-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <span class="date">2023</span>
+                    <h3>Diploma – Information Technology</h3>
+                    <h4>Aditya SilverOak University, Ahmedabad</h4>
+                    <p>Completed foundational studies in Information Technology with a strong academic record. CGPA: 7.97/10.</p>
+                    <div class="tags">
+                        <span class="tag">Web Design</span>
+                        <span class="tag">C++</span>
+                        <span class="tag">Database Concepts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+
+    <section id="projects" class="section projects">
+        <div class="section-header scroll-anim">
+            <h2>Featured <span class="gradient-text">Projects</span></h2>
+            <p>Showcasing my technical architecture and backend skills</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 40px; align-items: center;">
+            
+            <!-- Project 1 -->
+            <div class="glass-card scroll-anim" style="width: 100%; max-width: 800px; margin-bottom: 25px;" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1">
+                <h3 style="color: var(--accent-1); font-size: 1.8rem; margin-bottom: 10px;">MicroStore - E-Commerce Microservices</h3>
+                <h4 style="color: var(--text-primary); margin-bottom: 15px;">Distributed Cloud Architecture</h4>
+                <p>An enterprise-grade, scalable E-Commerce system featuring a dedicated <strong>Product Service</strong> and an independent <strong>Order Service</strong>. Showcases a custom-built, futuristic HTML5 Shopping Cart dashboard that manages state securely before dispatching multi-item transactions across the network.</p>
+                
+                <ul style="margin-top: 15px; margin-left: 20px; color: var(--text-secondary); margin-bottom: 20px;">
+                    <li><strong>Service Decoupling:</strong> Complete segregation of product inventory from order processing using independent Spring Boot JVMs and Memory databases.</li>
+                    <li><strong>Network RestTemplates:</strong> Synchronous network promises automatically execute multi-item purchases directly against the isolated Port 8081 databases sequentially.</li>
+                    <li><strong>Interactive Cart UI:</strong> Features an immersive Cyberpunk aesthetic with INR currency formatting, global cart tracking, async payment gateways, and custom end-user delivery CSS animations.</li>
+                </ul>
+
+                <div class="tags">
+                    <span class="tag">Java Spring Boot</span>
+                    <span class="tag">Microservices</span>
+                    <span class="tag">Distributed Systems</span>
+                    <span class="tag">REST Communications</span>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <a href="#" class="btn secondary-btn" style="display: inline-block; padding: 10px 20px;">View GitHub Repo (Coming Soon)</a>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="glass-card scroll-anim" style="width: 100%; max-width: 800px; --scroll-delay: 0.2s;" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1">
+                <h3 style="color: var(--accent-2); font-size: 1.8rem; margin-bottom: 10px;">TaskFlow - Agile Kanban Board</h3>
+                <h4 style="color: var(--text-primary); margin-bottom: 15px;">Full-Stack Web Application</h4>
+                <p>A full-stack, real-time Agile task management system. Features a robust Java Spring Boot REST API for cleanly handling task states via JPA, and a beautifully designed glassmorphism Vanilla JS frontend utilizing the robust HTML5 Drag-and-Drop API for seamless real-time state manipulation.</p>
+                <div class="tags">
+                    <span class="tag">Java Spring Boot</span>
+                    <span class="tag">Spring Data JPA</span>
+                    <span class="tag">Vanilla JS</span>
+                    <span class="tag">HTML5 Drag & Drop</span>
+                </div>
+                <div style="margin-top: 25px;">
+                    <a href="https://github.com/ERC0/taskflow-kanban" target="_blank" class="btn secondary-btn" style="display: inline-block; padding: 10px 20px;">View GitHub Repository</a>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="glass-card scroll-anim" style="width: 100%; max-width: 800px; --scroll-delay: 0.4s;" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1">
+                <h3 style="color: #a855f7; font-size: 1.8rem; margin-bottom: 10px;">EchoChat - Private HQ</h3>
+                <h4 style="color: var(--text-primary); margin-bottom: 15px;">Secure WebSockets & FastAPI Architecture</h4>
+                <p>A professional-grade real-time chat matrix engineered with a high-performance Python <strong>FastAPI</strong> backend. The system unifies HTTP static file serving and dynamic WebSockets onto a single port, enabling seamless cloud deployments. Key features include <strong>Auto-Generated Secure URL Sessions</strong> with 1-click shareable invite links, guaranteeing peer isolation. The immersive Discord-inspired UI executes dynamic DOM routing alongside live debounced typing indicators, private whisper handling, and markdown parsing—built entirely using Vanilla JS and deep-glassmorphism CSS.</p>
+                <div class="tags">
+                    <span class="tag">FastAPI</span>
+                    <span class="tag">WebSockets</span>
+                    <span class="tag">Vanilla JS</span>
+                    <span class="tag">URL Routing & Privacy</span>
+                </div>
+                <div style="margin-top: 25px;">
+                    <a href="https://github.com/YOUR_USERNAME/echochat-hq" target="_blank" class="btn secondary-btn" style="display: inline-block; padding: 10px 20px;">View GitHub Repository</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer id="contact" class="section footer scroll-anim">
+        <div class="glass-card footer-card">
+            <h2>Let's build something <span class="gradient-text">amazing</span> together.</h2>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 20px;">
+                <a href="mailto:mihumodi@gmail.com" class="btn primary-btn btn-large">Email: mihumodi@gmail.com</a>
+                <a href="https://linkedin.com/in/mihir-amodwala-8ba3a7279" target="_blank" class="btn secondary-btn btn-large">LinkedIn Profile</a>
+            </div>
+            <p style="margin-top: 20px; color: var(--text-secondary);">Phone: +91-9724296359 | Based in Bharuch, Gujarat, India</p>
+            <p class="copyright">© 2026 Mihir Amodwala. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
