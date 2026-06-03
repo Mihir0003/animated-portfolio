@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep: #05111f;
+  --bg-mid: #10263c;
+  --bg-surface: rgba(8, 20, 36, 0.68);
+  --text-primary: #ecf4ff;
+  --text-secondary: #b8cbe0;
+  --accent-1: #4de4ff;
+  --accent-2: #ff8f3f;
+  --accent-3: #34f5b3;
+  --glass-border: rgba(120, 214, 255, 0.24);
+  --shadow-soft: 0 18px 45px rgba(3, 10, 20, 0.45);
+  --shadow-glow: 0 0 28px rgba(77, 228, 255, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 12% -8%, rgba(77, 228, 255, 0.22), transparent 45%),
+    radial-gradient(circle at 88% 112%, rgba(255, 143, 63, 0.16), transparent 42%),
+    linear-gradient(140deg, var(--bg-deep) 0%, #08182b 46%, #0d2035 100%);
+  line-height: 1.65;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Cyberpunk Mesh Grid overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(130, 190, 240, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(130, 190, 240, 0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  opacity: 0.28;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.blob {
+  position: fixed;
+  border-radius: 999px;
+  z-index: -3;
+  filter: blur(110px);
+  opacity: 0.4;
+  animation: floatBlob 24s ease-in-out infinite alternate;
+}
+
+.background-blob-1 {
+  width: 68vw;
+  height: 68vw;
+  top: -24vw;
+  left: -20vw;
+  background: radial-gradient(circle, rgba(77, 228, 255, 0.28) 0%, rgba(77, 228, 255, 0) 68%);
+}
+
+.background-blob-2 {
+  width: 58vw;
+  height: 58vw;
+  bottom: -26vw;
+  right: -18vw;
+  background: radial-gradient(circle, rgba(255, 143, 63, 0.24) 0%, rgba(255, 143, 63, 0) 70%);
+  animation-delay: -6s;
+}
+
+@keyframes floatBlob {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(80px, -50px, 0) scale(1.08);
+  }
+}
+
+/* Gradient Text Shimmer Effect */
+.gradient-text {
+  background: linear-gradient(118deg, var(--accent-1), var(--accent-3), var(--accent-2));
+  background-size: 190% 190%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerText 5.8s ease-in-out infinite;
+}
+
+@keyframes shimmerText {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Custom Nav Sweep Effect */
+.glass-nav-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 15%, rgba(77, 228, 255, 0.16) 47%, transparent 80%);
+  transform: translateX(-105%);
+  animation: navSweep 7.5s linear infinite;
+}
+
+@keyframes navSweep {
+  0%, 65% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+/* Custom Scroll animations (fallback or manual triggers) */
+.scroll-anim {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-anim.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(5, 17, 31, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(77, 228, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(77, 228, 255, 0.4);
+}
+
+/* Prose overrides for Markdown renderer */
+.prose {
+  color: var(--text-secondary);
+}
+.prose strong {
+  color: #fff;
+}
+.prose a {
+  color: var(--accent-1);
+  text-decoration: underline;
+}
+.prose a:hover {
+  color: var(--accent-3);
+}
