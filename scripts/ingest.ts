@@ -2,22 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { QdrantClient } from "@qdrant/js-client-rest";
-import dns from "dns";
 import { getEmbedding } from "../lib/embeddings";
 
-// Monkey-patch dns.lookup to force IPv4 and bypass macOS/Node IPv6 fetch bugs
-const originalLookup = dns.lookup;
-// @ts-ignore
-dns.lookup = function (hostname, options, callback) {
-  let cb = callback;
-  let opt = options;
-  if (typeof opt === "function") {
-    cb = opt;
-    opt = {};
-  }
-  const finalOpt = typeof opt === "number" ? { family: 4 } : { ...opt, family: 4 };
-  return originalLookup.call(dns, hostname, finalOpt, cb);
-};
+
 
 // Load environment variables from .env
 dotenv.config();
