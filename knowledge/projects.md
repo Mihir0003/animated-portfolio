@@ -29,3 +29,15 @@
   - Designed an auto-generated secure URL session mechanic allowing users to share room links for instant isolated group chats.
   - Engineered the client-side UI with a Discord-inspired layout, incorporating live debounced typing indicators, private whispers, and markdown message rendering.
 - **Outcome**: Deployed a scalable, real-time chatting backend via Docker. Live deployment running at: [https://erc003-echochat.hf.space](https://erc003-echochat.hf.space).
+
+## 4. AI Portfolio Assistant - Intelligent Chatbot
+- **Project Name**: AI Portfolio Assistant (RAG Chatbot)
+- **Description**: An intelligent, context-aware AI assistant integrated directly into the portfolio website. Uses a high-performance Retrieval-Augmented Generation (RAG) pipeline to query vector databases in the cloud and deliver factual, citation-backed answers about Mihir's experience, projects, skills, and resume.
+- **Technology Stack**: Next.js, React, Tailwind CSS, Qdrant Cloud (Vector Database), Google Gemini API (gemini-2.5-flash & gemini-embedding-2), TypeScript, RAG Pipeline.
+- **Responsibilities**:
+  - Engineered the Retrieval-Augmented Generation (RAG) backend that vectorizes incoming questions and queries the Qdrant Cloud database.
+  - Replaced local Ollama model dependencies with Google Gemini Cloud APIs (Gemini 2.5 Flash and Gemini Embedding 2), bringing latency down from 30+ seconds to under 1.5 seconds.
+  - Implemented client-side floating chatbot component featuring suggested questions, auto-scrolling, status indicators, and markdown formatting support.
+  - Configured robust fallback logic allowing the system to run on local Ollama models (`qwen2.5` & `nomic-embed-text`) during offline development.
+- **Outcome**: Fully integrated cloud-powered AI chatbot deployed live at: [https://animated-portfolio-kohl.vercel.app/](https://animated-portfolio-kohl.vercel.app/).
+

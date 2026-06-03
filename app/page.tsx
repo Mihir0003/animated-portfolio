@@ -473,6 +473,58 @@ export default function Home() {
             </div>
           </motion.div>
 
+          {/* Project 4 - AI Portfolio Assistant */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="w-full max-w-[850px] bg-bg-surface/50 border border-glass-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md hover:border-accent-1/50 hover:shadow-[0_0_40px_rgba(77,228,255,0.18)] transition-all duration-300"
+          >
+            <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
+              <div>
+                <h3 className="font-orbitron font-bold text-2xl text-accent-1">AI Portfolio Assistant - Intelligent Chatbot</h3>
+                <h4 className="text-white font-medium text-sm mt-1">Serverless Cloud AI & RAG Pipeline</h4>
+              </div>
+              <span className="text-[10px] uppercase font-bold tracking-widest px-3 py-1 border border-accent-1/30 bg-accent-1/5 text-accent-1 rounded">
+                Live Deployment
+              </span>
+            </div>
+
+            <p className="text-text-secondary text-sm md:text-base leading-relaxed mb-5">
+              An intelligent, context-aware AI assistant integrated directly into this portfolio website. Uses a high-performance **Retrieval-Augmented Generation (RAG)** pipeline to query vector databases in the cloud and deliver factual, citation-backed answers about professional experience, projects, skills, and resume details in real time.
+            </p>
+
+            <ul className="list-disc pl-5 text-sm text-text-secondary/80 space-y-2 mb-6">
+              <li><strong>Google Gemini Cloud API</strong>: Leverages Gemini 2.5 Flash for low-latency text generation and Gemini-embedding-2 for fast vector generation, bringing latency to under 1.5 seconds.</li>
+              <li><strong>Qdrant Cloud Integration</strong>: Interfaces with a hosted Qdrant Vector Database containing vectorized semantic knowledge base chunks of the candidate's resume and qualifications.</li>
+              <li><strong>Local-to-Cloud Fallback</strong>: Engineered a flexible fallback routing to local Ollama models (`qwen2.5` & `nomic-embed-text`) for fully offline local testing.</li>
+            </ul>
+
+            <div className="flex flex-wrap gap-2 mb-8">
+              {["Next.js", "Qdrant Cloud", "Google Gemini API", "Vector Embeddings", "RAG Pipeline", "Serverless Functions"].map((tag) => (
+                <span key={tag} className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#0a1627]/80 text-text-secondary">{tag}</span>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              <a
+                href="https://animated-portfolio-kohl.vercel.app/"
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-transparent bg-gradient-to-r from-accent-1 to-accent-3 text-bg-deep font-orbitron font-bold text-xs uppercase tracking-wider hover:shadow-[0_0_15px_rgba(77,228,255,0.3)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+              >
+                ⚡ Live Application <ExternalLink size={14} />
+              </a>
+              <a
+                href="https://github.com/Mihir0003/animated-portfolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-white/20 bg-bg-mid/30 hover:border-accent-1 hover:bg-bg-mid/50 text-white font-orbitron font-bold text-xs uppercase tracking-wider hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+              >
+                <Github size={14} /> View Repository <ExternalLink size={14} />
+              </a>
+            </div>
+          </motion.div>
+
         </div>
       </section>
 
