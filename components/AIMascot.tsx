@@ -5,8 +5,8 @@ import { motion, useMotionValue, useSpring, AnimatePresence, useVelocity, useMot
 
 const IDLE_MESSAGES = [
   "Need help?",
-  "Explore my projects 🚀",
-  "Ask me anything.",
+  "Explore my projects 🗄️",
+  "Ask me anything",
   "Let's build something amazing!",
 ];
 

@@ -6,7 +6,7 @@ Here is a quick reference guide to all your live portfolio projects. You can cmd
 
 ### 🤖 AI Portfolio Assistant
 Your interactive animated portfolio integrated with a custom AI RAG Chatbot using Gemini API and Next.js.
-👉 **[Open Portfolio Site](https://animated-portfolio.vercel.app)**
+👉 **[Open Portfolio Site](https://animated-portfolio-kohl.vercel.app)**
 
 ---
 
