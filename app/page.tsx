@@ -93,7 +93,7 @@ export default function Home() {
             onClick={(e) => handleScroll(e, "contact")}
             className="text-xs px-5 py-2 rounded-full border border-accent-1/30 bg-accent-1/5 text-accent-1 font-orbitron font-semibold uppercase tracking-wider hover:bg-accent-1 hover:text-bg-deep hover:shadow-[0_0_15px_rgba(77,228,255,0.3)] transition-all duration-300 active:scale-95"
           >
-            Hire Me
+            Contact Me
           </a>
         </div>
       </motion.nav>
