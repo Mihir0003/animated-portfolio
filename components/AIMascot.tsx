@@ -91,10 +91,6 @@ export const AIMascot = () => {
       window.addEventListener("mousemove", handleMouseMove);
     }
 
-    if (typeof window !== "undefined") {
-      targetRobotX.set(window.innerWidth - 150);
-    }
-
     const triggerRandomMessage = () => {
       if (!isHovered && !isYawning) {
         const randomMsg = IDLE_MESSAGES[Math.floor(Math.random() * IDLE_MESSAGES.length)];
@@ -137,6 +133,13 @@ export const AIMascot = () => {
       observer.disconnect();
     };
   }, [isMobile, isHovered, isYawning, facingRight]); 
+
+  // Initialize robot position on mount only
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      targetRobotX.set(window.innerWidth - 150);
+    }
+  }, []);
 
   const handleClick = () => {
     setIsClicked(true);
