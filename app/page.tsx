@@ -14,25 +14,29 @@ const useTypewriter = (text: string, speed = 80, delay = 1200) => {
   useEffect(() => {
     let index = 0;
     let timer: NodeJS.Timeout;
+    let interval: NodeJS.Timeout;
+    
+    // Reset state when text changes
+    setDisplayText("");
+    setShowCursor(true);
     
     const startTimeout = setTimeout(() => {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         if (index < text.length) {
-          setDisplayText((prev) => prev + text.charAt(index));
+          setDisplayText(text.slice(0, index + 1));
           index++;
         } else {
           clearInterval(interval);
-          // Blink cursor briefly then hide it
           timer = setTimeout(() => {
             setShowCursor(false);
           }, 2000);
         }
       }, speed);
-      return () => clearInterval(interval);
     }, delay);
 
     return () => {
       clearTimeout(startTimeout);
+      clearInterval(interval);
       clearTimeout(timer);
     };
   }, [text, speed, delay]);
