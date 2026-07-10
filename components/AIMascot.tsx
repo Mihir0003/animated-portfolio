@@ -22,10 +22,15 @@ export const AIMascot = () => {
   // Mouse Tracking values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const targetRobotX = useMotionValue(0); // For horizontal sliding
+
   const springConfig = { damping: 25, stiffness: 150 };
   const eyeX = useSpring(mouseX, springConfig);
   const eyeY = useSpring(mouseY, springConfig);
   const headRotate = useSpring(useMotionValue(0), springConfig);
+  
+  // Robot horizontal spring (slower damping for smooth glide)
+  const robotX = useSpring(targetRobotX, { damping: 30, stiffness: 100 });
 
   // Blinking logic
   const [isBlinking, setIsBlinking] = useState(false);
@@ -64,10 +69,19 @@ export const AIMascot = () => {
       mouseX.set(Math.cos(angle) * distance);
       mouseY.set(Math.sin(angle) * distance);
       headRotate.set(Math.cos(angle) * (distance * 1.5)); // max 9 degrees rotation
+
+      // Slide robot horizontally
+      const clampedX = Math.max(20, Math.min(e.clientX - 40, window.innerWidth - 100));
+      targetRobotX.set(clampedX);
     };
 
     if (!isMobile) {
       window.addEventListener("mousemove", handleMouseMove);
+    }
+
+    // Initialize robot position on mount
+    if (typeof window !== "undefined") {
+      targetRobotX.set(window.innerWidth - 100);
     }
 
     // --- Random Idle Messages ---
@@ -131,7 +145,10 @@ export const AIMascot = () => {
   if (activeSection === "contact") displayMessage = "Let's get in touch!";
 
   return (
-    <div className="fixed bottom-24 right-6 z-[9990] flex flex-col items-center pointer-events-none">
+    <motion.div 
+      style={{ x: robotX }}
+      className="fixed bottom-0 left-0 pb-24 z-[9990] flex flex-col items-center pointer-events-none"
+    >
       
       {/* Speech Bubble */}
       <AnimatePresence>
@@ -307,6 +324,6 @@ export const AIMascot = () => {
 
         </svg>
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
