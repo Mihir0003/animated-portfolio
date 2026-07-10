@@ -39,6 +39,15 @@ export const ChatBot: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    const handleOpenChatbot = () => {
+      setIsOpen(true);
+      setIsMinimized(false);
+    };
+    window.addEventListener("open-chatbot", handleOpenChatbot);
+    return () => window.removeEventListener("open-chatbot", handleOpenChatbot);
+  }, []);
+
   const handleSendMessage = async (text: string) => {
     // 1. Append user message
     const userMessage: Message = {

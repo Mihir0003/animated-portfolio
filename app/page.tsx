@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bot, Mail, Linkedin, Github, Phone, MapPin, ExternalLink, Calendar, Award, GraduationCap, ChevronRight } from "lucide-react";
 import ChatBot from "@/components/chatbot/ChatBot";
+import { AIMascot } from "@/components/AIMascot";
 
 // Typewriter Hook for Hero Section
 const useTypewriter = (text: string, speed = 80, delay = 1200) => {
@@ -572,6 +573,9 @@ export default function Home() {
           </p>
         </motion.div>
       </footer>
+
+      {/* Floating Interactive AI Mascot */}
+      <AIMascot />
 
       {/* Floating RAG Chatbot widget in the bottom-right corner */}
       <ChatBot />
