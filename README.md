@@ -36,19 +36,6 @@ The chatbot uses a robust RAG architecture:
 
 ---
 
-## 🚀 Live Projects Dashboard
-
-| Project | Status | Link |
-|---------|--------|------|
-| **AI Portfolio Assistant** | 🟢 Live | [animated-portfolio.vercel.app](https://animated-portfolio.vercel.app) |
-| **TaskFlow Kanban** | 🟢 Live | [erc003-taskflow.hf.space](https://erc003-taskflow.hf.space) |
-| **EchoChat Private HQ** | 🟢 Live | [erc003-echochat.hf.space](https://erc003-echochat.hf.space) |
-| **MicroStore Backend** | 🟡 Local | Run locally in `microstore` |
-
-*(See the `Project_Links.md` file in this repository for quick access.)*
-
----
-
 ## 🛠️ Local Development
 
 To run this project locally on your machine:
