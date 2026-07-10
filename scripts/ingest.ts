@@ -1,28 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
-import { QdrantClient } from "@qdrant/js-client-rest";
 import { getEmbedding } from "../lib/embeddings";
-
-
 
 // Load environment variables from .env
 dotenv.config();
-
-const QDRANT_URL = process.env.QDRANT_URL;
-const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
-const COLLECTION_NAME = process.env.QDRANT_COLLECTION || "portfolio";
-
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-const EMBEDDING_MODEL = process.env.OLLAMA_EMBEDDING_MODEL || "nomic-embed-text";
-
-if (!QDRANT_URL || !QDRANT_API_KEY) {
-  console.error("Error: Missing required environment variables in .env (QDRANT_URL, QDRANT_API_KEY)");
-  process.exit(1);
-}
-
-// Initialize Qdrant Client
-const qdrant = new QdrantClient({ url: QDRANT_URL, apiKey: QDRANT_API_KEY, checkCompatibility: false });
 
 // Category mapping helper based on filename
 function getCategory(filename: string): string {
@@ -98,28 +80,7 @@ async function run() {
   const files = fs.readdirSync(knowledgeDir).filter((file) => file.endsWith(".md"));
   console.log(`Found ${files.length} knowledge base files to ingest.`);
 
-  // 1. Recreate Collection in Qdrant (deletes if exists, then creates with Cosine metric)
-  console.log(`Initializing collection "${COLLECTION_NAME}" in Qdrant...`);
-  try {
-    const collections = await qdrant.getCollections();
-    const exists = collections.collections.some((c) => c.name === COLLECTION_NAME);
-    if (exists) {
-      console.log(`Collection "${COLLECTION_NAME}" exists. Re-creating...`);
-      await qdrant.deleteCollection(COLLECTION_NAME);
-    }
-    await qdrant.createCollection(COLLECTION_NAME, {
-      vectors: {
-        size: 3072, // Dimension for gemini-embedding-2
-        distance: "Cosine",
-      },
-    });
-    console.log(`Collection "${COLLECTION_NAME}" created successfully.`);
-  } catch (error) {
-    console.error("Error setting up Qdrant collection:", error);
-    process.exit(1);
-  }
-
-  // 2. Load, chunk, and embed documents
+  // Load, chunk, and embed documents
   const points = [];
   let chunkCounter = 0;
 
@@ -179,17 +140,15 @@ async function run() {
     }
   }
 
-  // 3. Upload to Qdrant
+  // Save to local JSON file
   if (points.length > 0) {
-    console.log(`Uploading ${points.length} points to Qdrant collection "${COLLECTION_NAME}"...`);
+    const embeddingsPath = path.join(knowledgeDir, "embeddings.json");
+    console.log(`Saving ${points.length} points to ${embeddingsPath}...`);
     try {
-      await qdrant.upsert(COLLECTION_NAME, {
-        wait: true,
-        points: points,
-      });
-      console.log("Data ingestion completed successfully! All vectors stored.");
+      fs.writeFileSync(embeddingsPath, JSON.stringify(points, null, 2), "utf-8");
+      console.log("Data ingestion completed successfully! All vectors stored locally.");
     } catch (error) {
-      console.error("Error upserting vectors to Qdrant:", error);
+      console.error("Error saving vectors to JSON:", error);
     }
   } else {
     console.log("No vectors were generated. Ingestion aborted.");
