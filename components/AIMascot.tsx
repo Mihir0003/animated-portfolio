@@ -26,19 +26,20 @@ export const AIMascot = () => {
   // Mouse Tracking values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const targetRobotX = useMotionValue(0); // For horizontal sliding
+  const targetRobotX = useMotionValue(0); 
 
   const springConfig = { damping: 25, stiffness: 150 };
   const eyeX = useSpring(mouseX, springConfig);
   const eyeY = useSpring(mouseY, springConfig);
   const headRotate = useSpring(useMotionValue(0), springConfig);
   
-  // Robot horizontal spring (slower damping for smooth glide)
-  const robotX = useSpring(targetRobotX, { damping: 30, stiffness: 100 });
+  // Robot horizontal spring (Stiffer and snappier to fix gap issue!)
+  const robotX = useSpring(targetRobotX, { damping: 22, stiffness: 220 });
   const robotVelocity = useVelocity(robotX);
 
   useMotionValueEvent(robotVelocity, "change", (latest) => {
-    if (Math.abs(latest) > 20) {
+    // Threshold to detect walking
+    if (Math.abs(latest) > 15) {
       setIsWalking(true);
       setFacingRight(latest > 0);
     } else {
@@ -46,11 +47,9 @@ export const AIMascot = () => {
     }
   });
 
-  // Blinking logic
   const [isBlinking, setIsBlinking] = useState(false);
 
   useEffect(() => {
-    // Check if mobile (reduce motion / disable tracking)
     if (typeof window !== "undefined") {
       setIsMobile(window.matchMedia("(max-width: 768px)").matches);
     }
@@ -59,14 +58,12 @@ export const AIMascot = () => {
     let messageTimer: NodeJS.Timeout;
     let blinkTimer: NodeJS.Timeout;
 
-    // --- Cursor Tracking & Idle Timers ---
     const handleMouseMove = (e: MouseEvent) => {
-      // Reset Idle Timer on activity
       clearTimeout(idleTimer);
       setIsYawning(false);
       idleTimer = setTimeout(() => {
         setIsYawning(true);
-      }, 60000); // 60s idle -> yawn
+      }, 60000); 
 
       if (isMobile || !mascotRef.current) return;
 
@@ -80,15 +77,13 @@ export const AIMascot = () => {
       const angle = Math.atan2(dy, dx);
       const distance = Math.min(Math.sqrt(dx * dx + dy * dy) * 0.03, 6);
 
-      // Adjust eye tracking based on which way the body is facing
       const eyeDirMultiplier = facingRight ? 1 : -1;
-
       mouseX.set(Math.cos(angle) * distance * eyeDirMultiplier);
       mouseY.set(Math.sin(angle) * distance);
       headRotate.set(Math.cos(angle) * (distance * 1.5) * eyeDirMultiplier);
 
-      // Slide robot horizontally
-      const clampedX = Math.max(20, Math.min(e.clientX - 50, window.innerWidth - 100));
+      // PERFECTLY CENTER under mouse: width is 100, so center is e.clientX - 50
+      const clampedX = Math.max(0, Math.min(e.clientX - 50, window.innerWidth - 100));
       targetRobotX.set(clampedX);
     };
 
@@ -96,33 +91,29 @@ export const AIMascot = () => {
       window.addEventListener("mousemove", handleMouseMove);
     }
 
-    // Initialize robot position on mount
     if (typeof window !== "undefined") {
       targetRobotX.set(window.innerWidth - 150);
     }
 
-    // --- Random Idle Messages ---
     const triggerRandomMessage = () => {
       if (!isHovered && !isYawning) {
         const randomMsg = IDLE_MESSAGES[Math.floor(Math.random() * IDLE_MESSAGES.length)];
         setIdleMessage(randomMsg);
         messageTimer = setTimeout(() => {
           setIdleMessage(null);
-        }, 4000); // hide after 4s
+        }, 4000); 
       }
     };
-    const messageInterval = setInterval(triggerRandomMessage, 15000); // every 15s
+    const messageInterval = setInterval(triggerRandomMessage, 15000); 
 
-    // --- Random Blinking ---
     const triggerBlink = () => {
       setIsBlinking(true);
-      blinkTimer = setTimeout(() => setIsBlinking(false), 150); // blink duration
-      const nextBlink = Math.random() * 4000 + 2000; // 2s to 6s
+      blinkTimer = setTimeout(() => setIsBlinking(false), 150); 
+      const nextBlink = Math.random() * 4000 + 2000; 
       setTimeout(triggerBlink, nextBlink);
     };
     triggerBlink();
 
-    // --- Scroll Intersection Observer for Context ---
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -131,7 +122,7 @@ export const AIMascot = () => {
           }
         });
       },
-      { threshold: 0.5 } // Trigger when 50% of section is visible
+      { threshold: 0.5 } 
     );
 
     const sections = document.querySelectorAll("section, header");
@@ -145,7 +136,7 @@ export const AIMascot = () => {
       clearInterval(messageInterval);
       observer.disconnect();
     };
-  }, [isMobile, isHovered, isYawning, facingRight]); // Added facingRight to dependencies
+  }, [isMobile, isHovered, isYawning, facingRight]); 
 
   const handleClick = () => {
     setIsClicked(true);
@@ -155,7 +146,6 @@ export const AIMascot = () => {
     }, 600);
   };
 
-  // Determine current active message
   let displayMessage = idleMessage;
   if (isHovered) displayMessage = "Hi 👋 I'm Mihir's AI Assistant.";
   if (isYawning) displayMessage = "Zzz... 😴";
@@ -191,21 +181,22 @@ export const AIMascot = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative cursor-pointer pointer-events-auto"
+        style={{ originX: "50%" }} // Ensure perfect center flipping
         animate={{
           scaleX: facingRight ? 1 : -1,
-          y: isWalking ? [0, -3, 0] : (isClicked ? [0, -20, 0] : [-5, 5, -5]),
+          y: isWalking ? [0, -4, 0] : (isClicked ? [0, -20, 0] : [-5, 5, -5]),
         }}
         transition={{
           y: isWalking 
-            ? { duration: 0.3, repeat: Infinity, ease: "easeInOut" }
+            ? { duration: 0.4, repeat: Infinity, ease: "easeInOut" }
             : (isClicked ? { duration: 0.6, type: "spring", bounce: 0.6 } : { duration: 4, repeat: Infinity, ease: "easeInOut" }),
-          scaleX: { duration: 0.2, type: "spring", stiffness: 300, damping: 25 }
+          scaleX: { duration: 0.15, type: "spring", stiffness: 400, damping: 30 }
         }}
       >
-        {/* Subtle Glow */}
-        <div className="absolute inset-0 bg-[#00E5FF]/20 rounded-full blur-2xl transform scale-150 animate-pulse"></div>
+        {/* Subtle Background Glow */}
+        <div className="absolute inset-0 bg-[#00E5FF]/10 rounded-full blur-2xl transform scale-150 animate-pulse"></div>
 
-        {/* SVG Full Body Mascot */}
+        {/* Premium SVG Cyber-Mech */}
         <svg
           width="100"
           height="160"
@@ -214,132 +205,180 @@ export const AIMascot = () => {
           xmlns="http://www.w3.org/2000/svg"
           className="drop-shadow-2xl relative z-10"
         >
+          <defs>
+            <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#4B5563" />
+              <stop offset="50%" stopColor="#1F2937" />
+              <stop offset="100%" stopColor="#030712" />
+            </linearGradient>
+            <linearGradient id="darkMetalGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#1F2937" />
+              <stop offset="100%" stopColor="#020617" />
+            </linearGradient>
+            <linearGradient id="cyanGlow" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#A5F3FC" />
+              <stop offset="50%" stopColor="#00E5FF" />
+              <stop offset="100%" stopColor="#0284C7" />
+            </linearGradient>
+            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
           {/* --- Back Arm (Left Arm) --- */}
           <motion.g
-            animate={isWalking ? { rotate: [15, -25, 15] } : { rotate: 5 }}
-            transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "45px", originY: "85px" }}
+            animate={isWalking ? { rotate: [25, -25, 25] } : { rotate: 5 }}
+            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "50px", originY: "65px" }}
           >
-            <path d="M 45 85 Q 40 110 35 125" stroke="#0F172A" strokeWidth="10" strokeLinecap="round" />
-            <circle cx="35" cy="125" r="4" fill="#00E5FF" opacity="0.5" />
+            <path d="M 50 65 Q 40 85 45 105" stroke="url(#darkMetalGrad)" strokeWidth="8" strokeLinecap="round" />
+            <circle cx="45" cy="105" r="4" fill="#00E5FF" opacity="0.3" filter="url(#neonGlow)" />
           </motion.g>
 
-          {/* --- Back Leg (Left Leg) --- */}
+          {/* --- Back Leg (Left Leg - Fully Articulated) --- */}
           <motion.g
-            animate={isWalking ? { rotate: [-25, 25, -25] } : { rotate: 0 }}
-            transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "45px", originY: "115px" }}
+            animate={isWalking ? { rotate: [-25, 30, -25] } : { rotate: 5 }}
+            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "50px", originY: "105px" }}
           >
-            <path d="M 45 115 L 45 145" stroke="#0F172A" strokeWidth="12" strokeLinecap="round" />
-            {/* Foot */}
-            <path d="M 40 145 L 55 145 L 55 150 L 40 150 Z" fill="#020617" />
+            {/* Thigh */}
+            <line x1="50" y1="105" x2="50" y2="135" stroke="url(#darkMetalGrad)" strokeWidth="10" strokeLinecap="round" />
+            <circle cx="50" cy="135" r="3" fill="#00E5FF" opacity="0.4" />
+            
+            {/* Calf & Foot */}
+            <motion.g
+              animate={isWalking ? { rotate: [45, 0, 45] } : { rotate: 0 }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+              style={{ originX: "50px", originY: "135px" }}
+            >
+              <line x1="50" y1="135" x2="50" y2="160" stroke="url(#darkMetalGrad)" strokeWidth="7" strokeLinecap="round" />
+              <path d="M 46 160 L 56 160 L 56 165 L 44 165 Z" fill="#020617" />
+            </motion.g>
           </motion.g>
 
-          {/* --- Right Leg (Front Leg) --- */}
-          <motion.g
-            animate={isWalking ? { rotate: [25, -25, 25] } : { rotate: 0 }}
-            transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "55px", originY: "115px" }}
-          >
-            <path d="M 55 115 L 55 145" stroke="#111827" strokeWidth="14" strokeLinecap="round" />
-            {/* Foot */}
-            <path d="M 50 145 L 68 145 L 68 150 L 50 150 Z" fill="#00E5FF" className="drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
-          </motion.g>
-
-          {/* --- Torso / Trench Coat --- */}
+          {/* --- Torso / Mech Armor --- */}
+          {/* Main Chest Plate */}
           <path
-            d="M 35 75 Q 50 70 65 75 L 70 120 Q 50 125 30 120 Z"
-            fill="#111827"
+            d="M 40 55 L 60 55 C 65 70, 65 90, 58 110 L 42 110 C 35 90, 35 70, 40 55 Z"
+            fill="url(#metalGrad)"
             stroke="#1F2937"
-            strokeWidth="3"
+            strokeWidth="1.5"
           />
+          {/* Inner Glowing Core */}
+          <path d="M 45 65 L 55 65 L 53 85 L 47 85 Z" fill="#020617" />
+          <circle cx="50" cy="75" r="4" fill="url(#cyanGlow)" filter="url(#strongGlow)" />
+          {/* Neon Accents */}
+          <path d="M 42 55 L 40 70 M 58 55 L 60 70" stroke="#00E5FF" strokeWidth="1" opacity="0.5" filter="url(#neonGlow)" />
 
-          {/* --- Head & Hood --- */}
-          <motion.g style={{ rotate: headRotate, originX: "50px", originY: "50px" }}>
-            {/* Hood Outer */}
+          {/* --- Front Leg (Right Leg - Fully Articulated) --- */}
+          <motion.g
+            animate={isWalking ? { rotate: [30, -25, 30] } : { rotate: -5 }}
+            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "50px", originY: "105px" }}
+          >
+            {/* Thigh */}
+            <line x1="50" y1="105" x2="50" y2="135" stroke="url(#metalGrad)" strokeWidth="11" strokeLinecap="round" />
+            <circle cx="50" cy="135" r="3.5" fill="#00E5FF" filter="url(#neonGlow)" />
+            
+            {/* Calf & Foot */}
+            <motion.g
+              animate={isWalking ? { rotate: [0, 45, 0] } : { rotate: 0 }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+              style={{ originX: "50px", originY: "135px" }}
+            >
+              <line x1="50" y1="135" x2="50" y2="160" stroke="url(#metalGrad)" strokeWidth="8" strokeLinecap="round" />
+              <path d="M 45 160 L 58 160 L 58 165 L 43 165 Z" fill="#111827" stroke="#00E5FF" strokeWidth="0.5" />
+              {/* Thruster Glow on Foot */}
+              <circle cx="50" cy="165" r="3" fill="#00E5FF" filter="url(#strongGlow)" opacity={isWalking ? 0.8 : 0.2} />
+            </motion.g>
+          </motion.g>
+
+          {/* --- Head & Helmet --- */}
+          <motion.g style={{ rotate: headRotate, originX: "50px", originY: "45px" }}>
+            {/* Helmet Dome */}
             <path
-              d="M 30 75 C 20 30, 80 30, 70 75"
-              fill="#111827"
-              stroke="#00E5FF"
+              d="M 33 45 C 33 22, 67 22, 67 45 C 67 58, 33 58, 33 45"
+              fill="url(#metalGrad)"
+              stroke="#374151"
               strokeWidth="1.5"
-              strokeOpacity="0.3"
             />
-            {/* Face/Void */}
+            {/* Cyber Visor Base */}
             <path
-              d="M 35 70 C 30 45, 70 45, 65 70 C 65 80, 35 80, 35 70"
+              d="M 35 40 Q 50 48 65 40 L 63 50 Q 50 56 37 50 Z"
               fill="#020617"
+              stroke="#00E5FF"
+              strokeWidth="0.5"
+              strokeOpacity="0.4"
             />
 
-            {/* Glowing Eyes */}
+            {/* Glowing Visor Light */}
             <motion.g style={{ x: eyeX, y: eyeY }}>
               {!isYawning ? (
-                <>
-                  {/* Left Eye */}
-                  <motion.rect
-                    x="42"
-                    y="55"
-                    width="6"
-                    height="10"
-                    rx="3"
-                    fill="#00E5FF"
-                    className="drop-shadow-[0_0_8px_rgba(0,229,255,0.9)]"
-                    animate={{ scaleY: isBlinking ? 0.1 : 1 }}
-                    transition={{ duration: 0.1 }}
-                    style={{ originY: "60px" }}
-                  />
-                  {/* Right Eye */}
-                  <motion.rect
-                    x="56"
-                    y="55"
-                    width="6"
-                    height="10"
-                    rx="3"
-                    fill="#00E5FF"
-                    className="drop-shadow-[0_0_8px_rgba(0,229,255,0.9)]"
-                    animate={{ scaleY: isBlinking ? 0.1 : 1 }}
-                    transition={{ duration: 0.1 }}
-                    style={{ originY: "60px" }}
-                  />
-                </>
+                <motion.rect
+                  x="40"
+                  y="42"
+                  width="20"
+                  height="6"
+                  rx="3"
+                  fill="url(#cyanGlow)"
+                  filter="url(#strongGlow)"
+                  animate={{ scaleY: isBlinking ? 0.1 : 1 }}
+                  transition={{ duration: 0.1 }}
+                  style={{ originY: "45px" }}
+                />
               ) : (
-                // Yawning Eyes
-                <>
-                  <path d="M 40 60 Q 45 55 50 60" stroke="#00E5FF" strokeWidth="2" fill="none" className="drop-shadow-[0_0_5px_rgba(0,229,255,0.8)]" />
-                  <path d="M 54 60 Q 59 55 64 60" stroke="#00E5FF" strokeWidth="2" fill="none" className="drop-shadow-[0_0_5px_rgba(0,229,255,0.8)]" />
-                </>
+                // Yawning / Sleeping Visor Mode
+                <path 
+                  d="M 42 45 Q 50 40 58 45" 
+                  stroke="url(#cyanGlow)" 
+                  strokeWidth="2.5" 
+                  strokeLinecap="round" 
+                  fill="none" 
+                  filter="url(#neonGlow)" 
+                />
               )}
             </motion.g>
           </motion.g>
 
-          {/* --- Right Arm (Front Arm) & Holographic Tablet --- */}
+          {/* --- Front Arm (Right Arm) & Holographic Emitter --- */}
           <motion.g
             animate={
               isHovered 
-                ? { rotate: [0, -30, 20, -20, 0] } 
-                : (isWalking ? { rotate: [-15, 25, -15] } : { rotate: 0 })
+                ? { rotate: [0, -35, 15, -15, 0] } 
+                : (isWalking ? { rotate: [-25, 25, -25] } : { rotate: -10 })
             }
             transition={
               isHovered 
                 ? { duration: 0.8, ease: "easeInOut" }
-                : { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 0.8, repeat: Infinity, ease: "easeInOut" }
             }
-            style={{ originX: "60px", originY: "85px" }}
+            style={{ originX: "50px", originY: "65px" }}
           >
-            {/* Front Arm */}
-            <path d="M 60 85 Q 70 100 80 95" stroke="#111827" strokeWidth="12" strokeLinecap="round" />
+            {/* Front Arm Segment */}
+            <path d="M 50 65 Q 65 85 55 105" stroke="url(#metalGrad)" strokeWidth="9" strokeLinecap="round" />
             
-            {/* Hand */}
-            <circle cx="80" cy="95" r="5" fill="#00E5FF" className="drop-shadow-[0_0_5px_rgba(0,229,255,0.8)]" />
-
-            {/* Glowing Holographic Tablet */}
+            {/* Holographic Wrist Emitter */}
+            <ellipse cx="55" cy="105" rx="5" ry="3" fill="#020617" stroke="#00E5FF" strokeWidth="1" filter="url(#neonGlow)" />
+            
+            {/* Glowing Holographic Panel */}
             <motion.g
-              animate={{ y: [-2, 2, -2], rotateZ: [-2, 2, -2] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              animate={{ opacity: [0.6, 0.9, 0.6], y: [-2, 2, -2] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              <rect x="75" y="70" width="18" height="22" rx="2" fill="#020617" stroke="#00E5FF" strokeWidth="1.5" className="drop-shadow-[0_0_10px_rgba(0,229,255,0.5)]" />
-              <line x1="78" y1="75" x2="88" y2="75" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6" />
-              <line x1="78" y1="80" x2="85" y2="80" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6" />
-              <line x1="78" y1="85" x2="90" y2="85" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6" />
+              <polygon points="50,90 65,85 75,95 60,100" fill="#00E5FF" opacity="0.25" filter="url(#neonGlow)" />
+              <line x1="55" y1="90" x2="65" y2="88" stroke="#A5F3FC" strokeWidth="1" opacity="0.8" />
+              <line x1="57" y1="93" x2="68" y2="91" stroke="#A5F3FC" strokeWidth="1" opacity="0.8" />
             </motion.g>
           </motion.g>
 
