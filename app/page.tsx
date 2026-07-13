@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Bot, Mail, Linkedin, Github, Phone, MapPin, ExternalLink, Calendar, Award, GraduationCap, ChevronRight } from "lucide-react";
+import { Bot, Mail, Linkedin, Github, Phone, MapPin, ExternalLink, Calendar, Award, GraduationCap, ChevronRight, Briefcase } from "lucide-react";
 import ChatBot from "@/components/chatbot/ChatBot";
 import { AIMascot } from "@/components/AIMascot";
 
@@ -186,8 +186,9 @@ export default function Home() {
 
         {/* Timeline */}
         <div className="relative max-w-[860px] mx-auto">
-          {/* Central Line */}
-          <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[2px] bg-gradient-to-b from-transparent via-accent-1 to-accent-2" />
+          {/* Central Roadmap Line */}
+          <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[4px] bg-white/5 rounded-full" />
+          <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[4px] bg-gradient-to-b from-accent-3 via-accent-1 to-accent-2 shadow-[0_0_12px_rgba(77,228,255,0.4)] rounded-full" />
 
           {/* Timeline Items */}
           <div className="space-y-12">
@@ -201,7 +202,9 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-3.5 sm:left-5 w-5 h-5 rounded-full bg-bg-deep border-3 border-accent-3 shadow-[0_0_14px_rgba(182,102,210,0.6)] z-10 hover:scale-115 transition-transform" />
+              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-3 shadow-[0_0_14px_rgba(182,102,210,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-accent-3" />
+              </div>
               
               {/* Card */}
               <div className="bg-bg-surface/50 border border-glass-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md hover:border-accent-3/50 hover:shadow-[0_0_30px_rgba(182,102,210,0.15)] transition-all duration-300">
@@ -239,7 +242,9 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-3.5 sm:left-5 w-5 h-5 rounded-full bg-bg-deep border-3 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 hover:scale-115 transition-transform" />
+              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-accent-1" />
+              </div>
               
               {/* Card */}
               <div className="bg-bg-surface/50 border border-glass-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md hover:border-accent-1/50 hover:shadow-[0_0_30px_rgba(77,228,255,0.15)] transition-all duration-300">
@@ -279,7 +284,9 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-3.5 sm:left-5 w-5 h-5 rounded-full bg-bg-deep border-3 border-accent-2 shadow-[0_0_14px_rgba(255,143,63,0.55)] z-10 hover:scale-115 transition-transform" />
+              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-2 shadow-[0_0_14px_rgba(53,211,159,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-accent-2" />
+              </div>
               
               {/* Card */}
               <div className="bg-bg-surface/50 border border-glass-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md hover:border-accent-2/50 hover:shadow-[0_0_30px_rgba(255,143,63,0.15)] transition-all duration-300">
@@ -313,7 +320,9 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-3.5 sm:left-5 w-5 h-5 rounded-full bg-bg-deep border-3 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 hover:scale-115 transition-transform" />
+              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-accent-1" />
+              </div>
               
               {/* Card */}
               <div className="bg-bg-surface/50 border border-glass-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md hover:border-accent-1/50 hover:shadow-[0_0_30px_rgba(77,228,255,0.15)] transition-all duration-300">
