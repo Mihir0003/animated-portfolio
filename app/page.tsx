@@ -196,37 +196,6 @@ export default function Home() {
 
         {/* Timeline */}
         <div ref={timelineRef} className="relative max-w-[860px] mx-auto">
-          <style>{`
-            @keyframes smokeDrift {
-              0% {
-                transform: translate(-50%, 0) scale(0.4);
-                opacity: 0;
-              }
-              20% {
-                opacity: 0.6;
-                background: rgba(241, 245, 249, 0.6);
-              }
-              100% {
-                transform: translate(-50%, -28px) scale(2.5);
-                opacity: 0;
-                background: rgba(241, 245, 249, 0);
-              }
-            }
-            .smoke-puff {
-              position: absolute;
-              left: 50%;
-              width: 8px;
-              height: 8px;
-              background: rgba(241, 245, 249, 0.6);
-              border-radius: 50%;
-              filter: blur(1.5px);
-              pointer-events: none;
-            }
-            .smoke-1 { animation: smokeDrift 1.2s infinite ease-out; }
-            .smoke-2 { animation: smokeDrift 1.2s infinite ease-out 0.4s; }
-            .smoke-3 { animation: smokeDrift 1.2s infinite ease-out 0.8s; }
-          `}</style>
-
           {/* Railroad Track */}
           <div className="absolute top-0 bottom-0 left-[16px] sm:left-[24px] w-[16px] pointer-events-none">
             {/* Left Rail */}
@@ -247,11 +216,25 @@ export default function Home() {
             style={{ top: trainY, translateY: "-50%" }}
             className="absolute left-[12px] sm:left-[20px] w-[24px] h-[48px] z-20 pointer-events-none"
           >
-            {/* Smoke stack puffs (positioned near the smokestack at y=36px, drifting upwards/backwards) */}
+            {/* Smoke stack puffs (Framer Motion driven infinite loops) */}
             <div className="absolute top-[28px] left-0 right-0 h-1 pointer-events-none">
-              <div className="smoke-puff smoke-1" />
-              <div className="smoke-puff smoke-2" />
-              <div className="smoke-puff smoke-3" />
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    y: [0, -32],
+                    scale: [0.6, 2.8],
+                    opacity: [0, 0.7, 0],
+                  }}
+                  transition={{
+                    duration: 1.4,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                    delay: i * 0.45,
+                  }}
+                  className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-slate-200/75 rounded-full blur-[1px] pointer-events-none"
+                />
+              ))}
             </div>
 
             {/* Steam Locomotive SVG (Facing Downwards) */}
