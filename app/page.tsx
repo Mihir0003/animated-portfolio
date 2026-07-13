@@ -60,6 +60,139 @@ export default function Home() {
     <div className="text-text-primary min-h-screen relative font-space">
       {/* Background Cyberpunk Mesh Overlay */}
       <div className="absolute inset-0 bg-grid-pattern bg-[length:56px_56px] opacity-[0.28] pointer-events-none z-[-2]" />
+
+      {/* Winding Railroad Track & Loop Train across the Entire Page */}
+      <div className="absolute top-0 bottom-0 left-0 right-0 pointer-events-none z-0 overflow-hidden w-full h-full">
+        <svg 
+          width="100%" 
+          height="100%" 
+          viewBox="0 0 1000 5000" 
+          preserveAspectRatio="none" 
+          className="w-full h-full opacity-[0.38]"
+        >
+          <defs>
+            <linearGradient id="boilerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#475569" />
+              <stop offset="50%" stopColor="#334155" />
+              <stop offset="100%" stopColor="#1e293b" />
+            </linearGradient>
+            <linearGradient id="headlightBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(254, 240, 138, 0.9)" />
+              <stop offset="100%" stopColor="rgba(254, 240, 138, 0)" />
+            </linearGradient>
+            <filter id="smoke-blur" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="6" />
+            </filter>
+          </defs>
+
+          {/* Winding Path Definition (13 turns, full page height) */}
+          <path 
+            id="locomotive-path"
+            d="M 800,0 C 800,200 200,200 200,400 C 200,600 800,600 800,800 C 800,1000 200,1000 200,1200 C 200,1400 800,1400 800,1600 C 800,1800 200,1800 200,2000 C 200,2200 800,2200 800,2400 C 800,2600 200,2600 200,2800 C 200,3000 800,3000 800,3200 C 800,3400 200,3400 200,3600 C 200,3800 800,3800 800,4000 C 800,4200 200,4200 200,4400 C 200,4600 800,4600 800,4800 C 800,4900 200,4900 200,5000" 
+            fill="none" 
+            stroke="transparent"
+          />
+
+          {/* Wooden sleepers (Ties) */}
+          <path 
+            d="M 800,0 C 800,200 200,200 200,400 C 200,600 800,600 800,800 C 800,1000 200,1000 200,1200 C 200,1400 800,1400 800,1600 C 800,1800 200,1800 200,2000 C 200,2200 800,2200 800,2400 C 800,2600 200,2600 200,2800 C 200,3000 800,3000 800,3200 C 800,3400 200,3400 200,3600 C 200,3800 800,3800 800,4000 C 800,4200 200,4200 200,4400 C 200,4600 800,4600 800,4800 C 800,4900 200,4900 200,5000" 
+            fill="none" 
+            stroke="#78350f" 
+            strokeWidth="36" 
+            strokeDasharray="5, 24" 
+          />
+
+          {/* Center Rails (Steel Track) */}
+          <path 
+            d="M 800,0 C 800,200 200,200 200,400 C 200,600 800,600 800,800 C 800,1000 200,1000 200,1200 C 200,1400 800,1400 800,1600 C 800,1800 200,1800 200,2000 C 200,2200 800,2200 800,2400 C 800,2600 200,2600 200,2800 C 200,3000 800,3000 800,3200 C 800,3400 200,3400 200,3600 C 200,3800 800,3800 800,4000 C 800,4200 200,4200 200,4400 C 200,4600 800,4600 800,4800 C 800,4900 200,4900 200,5000" 
+            fill="none" 
+            stroke="#64748b" 
+            strokeWidth="10" 
+          />
+          {/* Neon Glow Core */}
+          <path 
+            d="M 800,0 C 800,200 200,200 200,400 C 200,600 800,600 800,800 C 800,1000 200,1000 200,1200 C 200,1400 800,1400 800,1600 C 800,1800 200,1800 200,2000 C 200,2200 800,2200 800,2400 C 800,2600 200,2600 200,2800 C 200,3000 800,3000 800,3200 C 800,3400 200,3400 200,3600 C 200,3800 800,3800 800,4000 C 800,4200 200,4200 200,4400 C 200,4600 800,4600 800,4800 C 800,4900 200,4900 200,5000" 
+            fill="none" 
+            stroke="#00f0ff" 
+            strokeWidth="3.5" 
+            className="drop-shadow-[0_0_8px_rgba(0,240,255,0.8)]"
+          />
+
+          {/* Moving Train Group */}
+          <g>
+            {/* Headlight beam */}
+            <polygon points="25,0 180,-60 180,60" fill="url(#headlightBeam)" />
+            
+            {/* Train base */}
+            <rect x="-65" y="-24" width="130" height="48" rx="8" fill="#1e293b" stroke="#475569" strokeWidth="2" />
+            
+            {/* Cabin (rear, left) */}
+            <rect x="-62" y="-21" width="39" height="42" rx="5" fill="#0f172a" stroke="#475569" strokeWidth="1.5" />
+            <rect x="-49" y="-16" width="18" height="32" rx="2" fill="#38bdf8" opacity="0.75" />
+            
+            {/* Boiler (front, right) */}
+            <rect x="-23" y="-17" width="86" height="34" rx="6" fill="url(#boilerGradient)" stroke="#475569" strokeWidth="1.5" />
+            <line x1="6" y1="-17" x2="6" y2="17" stroke="#64748b" strokeWidth="2" />
+            <line x1="32" y1="-17" x2="32" y2="17" stroke="#64748b" strokeWidth="2" />
+            
+            {/* Smokebox */}
+            <rect x="62" y="-13" width="13" height="26" rx="3" fill="#020617" />
+            {/* Headlight bulb */}
+            <circle cx="72" cy="0" r="8" fill="#fef08a" />
+            
+            {/* Smokestack */}
+            <circle cx="36" cy="0" r="9" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
+            
+            {/* Smoke puffs */}
+            <g>
+              <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="cy" from="0" to="-18" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0s" />
+              </circle>
+              <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                <animate attributeName="cy" from="0" to="18" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+              </circle>
+              <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                <animate attributeName="cy" from="0" to="-8" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+              </circle>
+              <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                <animate attributeName="cy" from="0" to="8" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+              </circle>
+              <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                <animate attributeName="cy" from="0" to="-12" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+              </circle>
+              <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                <animate attributeName="cy" from="0" to="12" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+              </circle>
+            </g>
+
+            <animateMotion 
+              dur="45s" 
+              repeatCount="indefinite" 
+              rotate="auto"
+            >
+              <mpath href="#locomotive-path" />
+            </animateMotion>
+          </g>
+        </svg>
+      </div>
       
       {/* Floating Navigation */}
       <motion.nav 
@@ -162,138 +295,7 @@ export default function Home() {
       </header>
 
       {/* Experience & Education Section */}
-      <section id="experience" className="py-24 max-w-[1120px] mx-auto px-6 relative overflow-hidden">
-        {/* Winding Railroad Track & Loop Train in the Background */}
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <svg 
-            width="100%" 
-            height="100%" 
-            viewBox="0 0 1000 1000" 
-            preserveAspectRatio="none" 
-            className="w-full h-full opacity-[0.16]"
-          >
-            <defs>
-              <linearGradient id="boilerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#475569" />
-                <stop offset="50%" stopColor="#334155" />
-                <stop offset="100%" stopColor="#1e293b" />
-              </linearGradient>
-              <linearGradient id="headlightBeam" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(254, 240, 138, 0.75)" />
-                <stop offset="100%" stopColor="rgba(254, 240, 138, 0)" />
-              </linearGradient>
-              <filter id="smoke-blur" x="-100%" y="-100%" width="300%" height="300%">
-                <feGaussianBlur stdDeviation="4.5" />
-              </filter>
-            </defs>
-
-            {/* Winding Path Definition */}
-            <path 
-              id="locomotive-path"
-              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
-              fill="none" 
-              stroke="transparent"
-            />
-
-            {/* Wooden sleepers (Ties) */}
-            <path 
-              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
-              fill="none" 
-              stroke="#78350f" 
-              strokeWidth="28" 
-              strokeDasharray="4, 18" 
-            />
-
-            {/* Center Rail (Steel) */}
-            <path 
-              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
-              fill="none" 
-              stroke="#64748b" 
-              strokeWidth="6" 
-            />
-            <path 
-              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
-              fill="none" 
-              stroke="#38bdf8" 
-              strokeWidth="2" 
-              opacity="0.8"
-            />
-
-            {/* Moving Train Group */}
-            <g>
-              {/* Headlight beam */}
-              <polygon points="20,0 150,-50 150,50" fill="url(#headlightBeam)" />
-              
-              {/* Train base */}
-              <rect x="-50" y="-18" width="100" height="36" rx="6" fill="#1e293b" stroke="#475569" strokeWidth="1.5" />
-              
-              {/* Cabin (rear, left) */}
-              <rect x="-48" y="-16" width="30" height="32" rx="4" fill="#0f172a" stroke="#475569" strokeWidth="1" />
-              <rect x="-38" y="-12" width="14" height="24" rx="2" fill="#38bdf8" opacity="0.65" />
-              
-              {/* Boiler (front, right) */}
-              <rect x="-18" y="-13" width="66" height="26" rx="5" fill="url(#boilerGradient)" stroke="#475569" strokeWidth="1" />
-              <line x1="5" y1="-13" x2="5" y2="13" stroke="#64748b" strokeWidth="1.5" />
-              <line x1="25" y1="-13" x2="25" y2="13" stroke="#64748b" strokeWidth="1.5" />
-              
-              {/* Smokebox */}
-              <rect x="48" y="-10" width="10" height="20" rx="2" fill="#020617" />
-              {/* Headlight bulb */}
-              <circle cx="56" cy="0" r="6" fill="#fef08a" />
-              
-              {/* Smokestack */}
-              <circle cx="28" cy="0" r="7" fill="#0f172a" stroke="#64748b" strokeWidth="1" />
-              
-              {/* Smoke puffs */}
-              <g>
-                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                  <animate attributeName="cy" from="0" to="-14" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                </circle>
-                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                  <animate attributeName="cy" from="0" to="14" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                </circle>
-                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                  <animate attributeName="cy" from="0" to="-6" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                </circle>
-                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                  <animate attributeName="cy" from="0" to="6" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                </circle>
-                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                  <animate attributeName="cy" from="0" to="-10" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                </circle>
-                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                  <animate attributeName="cy" from="0" to="10" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                </circle>
-              </g>
-
-              <animateMotion 
-                dur="20s" 
-                repeatCount="indefinite" 
-                rotate="auto"
-              >
-                <mpath href="#locomotive-path" />
-              </animateMotion>
-            </g>
-          </svg>
-        </div>
+      <section id="experience" className="py-24 max-w-[1120px] mx-auto px-6 relative">
 
         <div className="text-center flex flex-col items-center gap-3 mb-16 relative z-10">
           <motion.h2 
