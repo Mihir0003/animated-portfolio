@@ -268,7 +268,7 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-            </motion.div>v>
+            </motion.div>
 
             {/* B.Tech */}
             <motion.div 
@@ -590,20 +590,30 @@ export default function Home() {
             Interested in hiring me as an intern or full-stack software engineer? Reach out directly via email, connect on LinkedIn, or inspect my GitHub repositories.
           </p>
 
-          <div className="flex flex-wrap gap-4 justify-center items-center mt-4">
+          <div className="flex flex-wrap gap-4 justify-center items-center mt-4 font-orbitron font-bold text-sm tracking-wider uppercase">
             <a
               href="mailto:mihumodi@gmail.com"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-orbitron font-bold text-xs uppercase tracking-wider bg-gradient-to-br from-accent-1 to-accent-3 text-bg-deep shadow-[0_10px_24px_rgba(77,228,255,0.2)] hover:shadow-[0_14px_30px_rgba(77,228,255,0.3)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+              className="text-[#0284c7] hover:text-white transition-colors duration-200 cursor-pointer"
             >
-              <Mail size={16} /> Email: mihumodi@gmail.com
+              EMAIL
             </a>
+            <span className="text-white/20">|</span>
             <a
               href="https://linkedin.com/in/mihir-amodwala-8ba3a7279"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl border border-white/20 bg-bg-mid/30 hover:border-accent-1 hover:bg-bg-mid/50 text-white font-orbitron font-bold text-xs uppercase tracking-wider hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+              className="text-[#0284c7] hover:text-white transition-colors duration-200 cursor-pointer"
             >
-              <Linkedin size={16} /> LinkedIn Profile <ExternalLink size={14} />
+              LINKEDIN
+            </a>
+            <span className="text-white/20">|</span>
+            <a
+              href="https://github.com/Mihir0003"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0284c7] hover:text-white transition-colors duration-200 cursor-pointer"
+            >
+              GITHUB
             </a>
           </div>
 
