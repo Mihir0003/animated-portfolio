@@ -6,6 +6,9 @@ Jio-bp (Reliance BP Mobility Limited)
 ## Role
 Digital Team Intern
 
+## Location
+Navi Mumbai DAKC
+
 ## Duration
 January 2026 – June 2026
 

@@ -41,3 +41,14 @@
   - Configured robust fallback logic allowing the system to run on local Ollama models (`qwen2.5` & `nomic-embed-text`) during offline development.
 - **Outcome**: Fully integrated cloud-powered AI chatbot deployed live at: [https://animated-portfolio-kohl.vercel.app/](https://animated-portfolio-kohl.vercel.app/).
 
+
+## 5. PEMS - Personal Productivity Companion
+- **Project Name**: Plant Equipment Maintenance System (PEMS) / Personal Companion
+- **Description**: A comprehensive employee tracking and daily reporting system designed for high personal productivity. Includes modules for JWT authentication, live work timers, automated daily reports via AI, and iPhone PWA support.
+- **Technology Stack**: Next.js 15, React, Tailwind CSS, Java Spring Boot 3, Supabase (PostgreSQL), JWT, Vercel, Railway.
+- **Responsibilities**:
+  - Developed a scalable REST API using Spring Boot with secure JWT-based stateless authentication and BCrypt password hashing.
+  - Engineered the database schema in Supabase with over 14 tables, including attendance tracking, granular sessions, and leave balances.
+  - Designed an immersive Next.js frontend featuring an iOS-compatible Progressive Web App (PWA) manifest, dark/light mode toggle, and live timers.
+  - Deployed the frontend to Vercel and the backend to Railway.
+- **Outcome**: Successfully shipped Phase 1 of a production-ready personal companion application, streamlining daily work reporting and tracking.

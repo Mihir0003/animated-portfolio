@@ -21,3 +21,4 @@ You can view or download Mihir Miteshkumar Amodwala's official professional resu
   2. **EchoChat WebSocket Platform**: Real-time room chat system built with FastAPI and WebSockets, deployed on Hugging Face Spaces (https://erc003-echochat.hf.space).
   3. **AI Portfolio Assistant**: Intelligent chatbot using Next.js, Qdrant Cloud vector DB, and Google Gemini API for fast RAG portfolio queries, deployed on Vercel (https://animated-portfolio-kohl.vercel.app/).
   4. **MicroStore Microservices**: Decentralized Spring Boot e-commerce architecture using inter-service RestTemplate requests.
+  5. **PEMS (Productivity Companion)**: A comprehensive employee tracking and reporting system built with Next.js 15, Spring Boot 3, and Supabase. Features JWT auth, live timer, and AI-assisted daily reports.
