@@ -194,7 +194,7 @@ export default function Home() {
             
             {/* Jio bp Internship */}
             <motion.div 
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8 }}
@@ -232,9 +232,48 @@ export default function Home() {
               </div>
             </motion.div>
 
+            {
+            /* Reliance Industries DevOps */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="relative pl-14 sm:pl-20"
+            >
+              {/* Dot */}
+              <div className="absolute top-7 left-3.5 sm:left-5 w-5 h-5 rounded-full bg-bg-deep border-3 border-accent-3 shadow-[0_0_14px_rgba(182,102,210,0.6)] z-10 hover:scale-115 transition-transform" />
+              
+              {/* Card */}
+              <div className="bg-bg-surface/50 border border-glass-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-md hover:border-accent-3/50 hover:shadow-[0_0_30px_rgba(182,102,210,0.15)] transition-all duration-300">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <span className="inline-flex items-center gap-1.5 text-xs text-accent-3 font-bold tracking-wider uppercase bg-accent-3/10 px-3 py-1 rounded-full border border-accent-3/20">
+                    <Calendar size={12} /> July 2026
+                  </span>
+                  <span className="text-xs text-text-secondary/70">Reliance Industries (via Optimum Solutions)</span>
+                </div>
+                <h3 className="font-orbitron font-bold text-xl md:text-2xl text-white">DevOps Engineer</h3>
+                <h4 className="text-accent-3 font-semibold text-sm md:text-base mt-1 mb-4 flex items-center gap-2">
+                  <MapPin size={16} /> Navi Mumbai RCP
+                </h4>
+                <p className="text-text-secondary text-sm md:text-base leading-relaxed mb-4">
+                  Joined as a DevOps Engineer, working on client projects for Reliance Industries through Optimum Solutions Pvt Ltd.
+                </p>
+                <ul className="list-disc pl-5 text-sm text-text-secondary/80 space-y-2 mb-6">
+                  <li><strong>Infrastructure Management:</strong> Responsible for managing and optimizing deployment pipelines.</li>
+                  <li><strong>Automation:</strong> Streamlining deployment processes for enterprise applications.</li>
+                </ul>
+                <div className="flex flex-wrap gap-2">
+                  {["DevOps", "CI/CD", "Infrastructure", "Automation"].map((tag) => (
+                    <span key={tag} className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#0a1627]/80 text-text-secondary hover:border-accent-3/40 hover:text-white transition-colors duration-200">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
             {/* B.Tech */}
             <motion.div 
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8 }}
