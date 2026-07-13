@@ -47,16 +47,6 @@ const useTypewriter = (text: string, speed = 80, delay = 1200) => {
 export default function Home() {
   const { displayText, showCursor } = useTypewriter("Mihir Amodwala", 80, 1200);
 
-  // Scroll tracking for the timeline train
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: timelineRef,
-    offset: ["start center", "end center"]
-  });
-  
-  // Transform scroll progress into vertical position along the line
-  const trainY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
   // Smooth scroll helper
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -172,8 +162,122 @@ export default function Home() {
       </header>
 
       {/* Experience & Education Section */}
-      <section id="experience" className="py-24 max-w-[1120px] mx-auto px-6">
-        <div className="text-center flex flex-col items-center gap-3 mb-16">
+      <section id="experience" className="py-24 max-w-[1120px] mx-auto px-6 relative overflow-hidden">
+        {/* Winding Railroad Track & Loop Train in the Background */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <svg 
+            width="100%" 
+            height="100%" 
+            viewBox="0 0 1000 1000" 
+            preserveAspectRatio="none" 
+            className="w-full h-full opacity-[0.16]"
+          >
+            <defs>
+              <linearGradient id="boilerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#475569" />
+                <stop offset="50%" stopColor="#334155" />
+                <stop offset="100%" stopColor="#1e293b" />
+              </linearGradient>
+              <linearGradient id="headlightBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(254, 240, 138, 0.75)" />
+                <stop offset="100%" stopColor="rgba(254, 240, 138, 0)" />
+              </linearGradient>
+              <filter id="smoke-blur" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" />
+              </filter>
+            </defs>
+
+            {/* Winding Path Definition */}
+            <path 
+              id="locomotive-path"
+              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
+              fill="none" 
+              stroke="transparent"
+            />
+
+            {/* Wooden sleepers (Ties) */}
+            <path 
+              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
+              fill="none" 
+              stroke="#78350f" 
+              strokeWidth="28" 
+              strokeDasharray="4, 18" 
+            />
+
+            {/* Center Rail (Steel) */}
+            <path 
+              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
+              fill="none" 
+              stroke="#64748b" 
+              strokeWidth="6" 
+            />
+            <path 
+              d="M 800,0 C 800,100 200,100 200,200 C 200,300 800,300 800,400 C 800,500 200,500 200,600 C 200,700 800,700 800,800 C 800,900 200,900 200,1000" 
+              fill="none" 
+              stroke="#38bdf8" 
+              strokeWidth="2" 
+              opacity="0.8"
+            />
+
+            {/* Moving Train Group */}
+            <g>
+              {/* Headlight beam */}
+              <polygon points="20,0 150,-50 150,50" fill="url(#headlightBeam)" />
+              
+              {/* Train base */}
+              <rect x="-50" y="-18" width="100" height="36" rx="6" fill="#1e293b" stroke="#475569" strokeWidth="1.5" />
+              
+              {/* Cabin (rear, left) */}
+              <rect x="-48" y="-16" width="30" height="32" rx="4" fill="#0f172a" stroke="#475569" strokeWidth="1" />
+              <rect x="-38" y="-12" width="14" height="24" rx="2" fill="#38bdf8" opacity="0.65" />
+              
+              {/* Boiler (front, right) */}
+              <rect x="-18" y="-13" width="66" height="26" rx="5" fill="url(#boilerGradient)" stroke="#475569" strokeWidth="1" />
+              <line x1="5" y1="-13" x2="5" y2="13" stroke="#64748b" strokeWidth="1.5" />
+              <line x1="25" y1="-13" x2="25" y2="13" stroke="#64748b" strokeWidth="1.5" />
+              
+              {/* Smokebox */}
+              <rect x="48" y="-10" width="10" height="20" rx="2" fill="#020617" />
+              {/* Headlight bulb */}
+              <circle cx="56" cy="0" r="6" fill="#fef08a" />
+              
+              {/* Smokestack */}
+              <circle cx="28" cy="0" r="7" fill="#0f172a" stroke="#64748b" strokeWidth="1" />
+              
+              {/* Smoke puffs */}
+              <g>
+                <circle r="4" fill="#cbd5e1" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-80" dur="1.2s" repeatCount="indefinite" begin="0s" />
+                  <animate attributeName="cy" from="0" to="-8" dur="1.2s" repeatCount="indefinite" begin="0s" />
+                  <animate attributeName="r" from="3" to="18" dur="1.2s" repeatCount="indefinite" begin="0s" />
+                  <animate attributeName="opacity" values="0; 0.6; 0" keyTimes="0; 0.15; 1" dur="1.2s" repeatCount="indefinite" begin="0s" />
+                </circle>
+                <circle r="4" fill="#cbd5e1" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-80" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
+                  <animate attributeName="cy" from="0" to="8" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
+                  <animate attributeName="r" from="3" to="18" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
+                  <animate attributeName="opacity" values="0; 0.6; 0" keyTimes="0; 0.15; 1" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
+                </circle>
+                <circle r="4" fill="#cbd5e1" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-80" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
+                  <animate attributeName="cy" from="0" to="-2" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
+                  <animate attributeName="r" from="3" to="18" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
+                  <animate attributeName="opacity" values="0; 0.6; 0" keyTimes="0; 0.15; 1" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
+                </circle>
+              </g>
+
+              <animateMotion 
+                dur="20s" 
+                repeatCount="indefinite" 
+                rotate="auto"
+              >
+                <mpath href="#locomotive-path" />
+              </animateMotion>
+            </g>
+          </svg>
+        </div>
+
+        <div className="text-center flex flex-col items-center gap-3 mb-16 relative z-10">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -195,87 +299,9 @@ export default function Home() {
         </div>
 
         {/* Timeline */}
-        <div ref={timelineRef} className="relative max-w-[860px] mx-auto">
-          {/* Railroad Track */}
-          <div className="absolute top-0 bottom-0 left-[16px] sm:left-[24px] w-[16px] pointer-events-none">
-            {/* Left Rail */}
-            <div className="absolute left-[2px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#64748b] via-[#94a3b8] to-[#64748b] shadow-[0_0_4px_rgba(255,255,255,0.2)]" />
-            {/* Right Rail */}
-            <div className="absolute right-[2px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#64748b] via-[#94a3b8] to-[#64748b] shadow-[0_0_4px_rgba(255,255,255,0.2)]" />
-            {/* Wooden Sleepers (Ties) */}
-            <div 
-              className="absolute inset-y-0 left-0 right-0 opacity-45"
-              style={{
-                backgroundImage: "repeating-linear-gradient(to bottom, transparent, transparent 12px, #78350f 12px, #78350f 14px)"
-              }}
-            />
-          </div>
-
-          {/* Animated Train (Realistic Steam Locomotive traveling down the track) */}
-          <motion.div 
-            style={{ top: trainY, translateY: "-50%" }}
-            className="absolute left-[12px] sm:left-[20px] w-[24px] h-[48px] z-20 pointer-events-none"
-          >
-            {/* Smoke stack puffs (Framer Motion driven infinite loops) */}
-            <div className="absolute top-[28px] left-0 right-0 h-1 pointer-events-none">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  animate={{
-                    y: [0, -32],
-                    scale: [0.6, 2.8],
-                    opacity: [0, 0.7, 0],
-                  }}
-                  transition={{
-                    duration: 1.4,
-                    repeat: Infinity,
-                    ease: "easeOut",
-                    delay: i * 0.45,
-                  }}
-                  className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-slate-200/75 rounded-full blur-[1px] pointer-events-none"
-                />
-              ))}
-            </div>
-
-            {/* Steam Locomotive SVG (Facing Downwards) */}
-            <svg viewBox="0 0 32 64" className="w-[24px] h-[48px] filter drop-shadow-[0_0_8px_rgba(77,228,255,0.4)]">
-              <defs>
-                <linearGradient id="boilerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#1e293b" />
-                  <stop offset="50%" stopColor="#334155" />
-                  <stop offset="100%" stopColor="#0f172a" />
-                </linearGradient>
-                <linearGradient id="headlightGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(254, 240, 138, 0.7)" />
-                  <stop offset="100%" stopColor="rgba(254, 240, 138, 0)" />
-                </linearGradient>
-              </defs>
-
-              {/* Cabin roof / body (rear) */}
-              <rect x="4" y="4" width="24" height="14" rx="1.5" fill="#0f172a" stroke="#475569" strokeWidth="1" />
-              {/* Windows */}
-              <rect x="7" y="7" width="7" height="6" rx="0.5" fill="#38bdf8" opacity="0.65" />
-              <rect x="18" y="7" width="7" height="6" rx="0.5" fill="#38bdf8" opacity="0.65" />
-              
-              {/* Boiler cylinder body */}
-              <rect x="6" y="18" width="20" height="34" rx="2" fill="url(#boilerGrad)" stroke="#475569" strokeWidth="1" />
-              
-              {/* Boiler metal strap bands */}
-              <line x1="6" y1="26" x2="26" y2="26" stroke="#64748b" strokeWidth="1.5" />
-              <line x1="6" y1="36" x2="26" y2="36" stroke="#64748b" strokeWidth="1.5" />
-              
-              {/* Smokebox front plate */}
-              <rect x="8" y="52" width="16" height="6" rx="1" fill="#020617" />
-              
-              {/* Headlight cone of light pointing forward (downwards) */}
-              <polygon points="16,55 0,78 32,78" fill="url(#headlightGrad)" />
-              {/* Headlight bulb */}
-              <circle cx="16" cy="55" r="3.5" fill="#fef08a" />
-              
-              {/* Smokestack opening (top view) */}
-              <circle cx="16" cy="44" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="1" />
-            </svg>
-          </motion.div>
+        <div className="relative max-w-[860px] mx-auto z-10">
+          {/* Connecting Timeline Line */}
+          <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[2px] bg-gradient-to-b from-accent-1 via-accent-3 to-accent-2 opacity-30 shadow-[0_0_8px_rgba(77,228,255,0.3)]" />
 
           {/* Timeline Items */}
           <div className="space-y-12">
@@ -289,7 +315,7 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-3 shadow-[0_0_14px_rgba(182,102,210,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+              <div className="absolute top-7 left-[9px] sm:left-[13px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-3 shadow-[0_0_14px_rgba(182,102,210,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
                 <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-accent-3" />
               </div>
               
@@ -329,7 +355,7 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+              <div className="absolute top-7 left-[9px] sm:left-[13px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
                 <Award className="w-4 h-4 sm:w-5 sm:h-5 text-accent-1" />
               </div>
               
@@ -371,7 +397,7 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-2 shadow-[0_0_14px_rgba(53,211,159,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+              <div className="absolute top-7 left-[9px] sm:left-[13px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-2 shadow-[0_0_14px_rgba(53,211,159,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
                 <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-accent-2" />
               </div>
               
@@ -407,7 +433,7 @@ export default function Home() {
               className="relative pl-14 sm:pl-20"
             >
               {/* Dot */}
-              <div className="absolute top-7 left-[10px] sm:left-[14px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
+              <div className="absolute top-7 left-[9px] sm:left-[13px] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-deep border-2 border-accent-1 shadow-[0_0_14px_rgba(77,228,255,0.6)] z-10 flex items-center justify-center hover:scale-110 transition-all duration-300">
                 <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-accent-1" />
               </div>
               
