@@ -182,8 +182,8 @@ export default function Home() {
                 <stop offset="0%" stopColor="rgba(254, 240, 138, 0.75)" />
                 <stop offset="100%" stopColor="rgba(254, 240, 138, 0)" />
               </linearGradient>
-              <filter id="smoke-blur" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="2" />
+              <filter id="smoke-blur" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="4.5" />
               </filter>
             </defs>
 
@@ -246,23 +246,41 @@ export default function Home() {
               
               {/* Smoke puffs */}
               <g>
-                <circle r="4" fill="#cbd5e1" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-80" dur="1.2s" repeatCount="indefinite" begin="0s" />
-                  <animate attributeName="cy" from="0" to="-8" dur="1.2s" repeatCount="indefinite" begin="0s" />
-                  <animate attributeName="r" from="3" to="18" dur="1.2s" repeatCount="indefinite" begin="0s" />
-                  <animate attributeName="opacity" values="0; 0.6; 0" keyTimes="0; 0.15; 1" dur="1.2s" repeatCount="indefinite" begin="0s" />
+                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                  <animate attributeName="cy" from="0" to="-14" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0s" />
                 </circle>
-                <circle r="4" fill="#cbd5e1" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-80" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
-                  <animate attributeName="cy" from="0" to="8" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
-                  <animate attributeName="r" from="3" to="18" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
-                  <animate attributeName="opacity" values="0; 0.6; 0" keyTimes="0; 0.15; 1" dur="1.2s" repeatCount="indefinite" begin="0.4s" />
+                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                  <animate attributeName="cy" from="0" to="14" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
                 </circle>
-                <circle r="4" fill="#cbd5e1" opacity="0" filter="url(#smoke-blur)">
-                  <animate attributeName="cx" from="28" to="-80" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
-                  <animate attributeName="cy" from="0" to="-2" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
-                  <animate attributeName="r" from="3" to="18" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
-                  <animate attributeName="opacity" values="0; 0.6; 0" keyTimes="0; 0.15; 1" dur="1.2s" repeatCount="indefinite" begin="0.8s" />
+                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                  <animate attributeName="cy" from="0" to="-6" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                </circle>
+                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                  <animate attributeName="cy" from="0" to="6" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                </circle>
+                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                  <animate attributeName="cy" from="0" to="-10" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                </circle>
+                <circle r="4" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
+                  <animate attributeName="cx" from="28" to="-140" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                  <animate attributeName="cy" from="0" to="10" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                  <animate attributeName="r" from="4" to="26" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                  <animate attributeName="opacity" values="0; 0.7; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
                 </circle>
               </g>
 
