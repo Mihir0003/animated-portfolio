@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Bot, Mail, Linkedin, Github, Phone, MapPin, ExternalLink, Calendar, Award, GraduationCap, ChevronRight, Briefcase } from "lucide-react";
 import ChatBot from "@/components/chatbot/ChatBot";
 import { AIMascot } from "@/components/AIMascot";
@@ -46,6 +46,16 @@ const useTypewriter = (text: string, speed = 80, delay = 1200) => {
 
 export default function Home() {
   const { displayText, showCursor } = useTypewriter("Mihir Amodwala", 80, 1200);
+
+  // Scroll tracking for the timeline train
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ["start center", "end center"]
+  });
+  
+  // Transform scroll progress into vertical position along the line
+  const trainY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   // Smooth scroll helper
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -185,10 +195,21 @@ export default function Home() {
         </div>
 
         {/* Timeline */}
-        <div className="relative max-w-[860px] mx-auto">
+        <div ref={timelineRef} className="relative max-w-[860px] mx-auto">
           {/* Central Roadmap Line */}
           <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[4px] bg-white/5 rounded-full" />
           <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[4px] bg-gradient-to-b from-accent-3 via-accent-1 to-accent-2 shadow-[0_0_12px_rgba(77,228,255,0.4)] rounded-full" />
+
+          {/* Animated Train (glowing capsule traveling down the track) */}
+          <motion.div 
+            style={{ top: trainY, translateY: "-50%" }}
+            className="absolute left-6 sm:left-8 w-[8px] h-[36px] -ml-[2px] rounded-full bg-gradient-to-b from-accent-1 via-accent-3 to-accent-2 shadow-[0_0_15px_rgba(77,228,255,0.9),0_0_30px_rgba(77,228,255,0.5)] z-20 flex flex-col justify-between items-center py-1.5"
+          >
+            {/* Inner window lights of the train */}
+            <div className="w-[2px] h-[4px] bg-white/90 rounded-full shadow-[0_0_4px_white]" />
+            <div className="w-[2px] h-[4px] bg-white/90 rounded-full shadow-[0_0_4px_white]" />
+            <div className="w-[2px] h-[4px] bg-white/90 rounded-full shadow-[0_0_4px_white]" />
+          </motion.div>
 
           {/* Timeline Items */}
           <div className="space-y-12">
