@@ -121,65 +121,96 @@ export default function Home() {
           {/* Moving Train Group */}
           <g>
             {/* Headlight beam */}
-            <polygon points="25,0 180,-60 180,60" fill="url(#headlightBeam)" />
+            <polygon points="36,2 180,-40 180,50" fill="url(#headlightBeam)" />
             
-            {/* Train base */}
-            <rect x="-65" y="-24" width="130" height="48" rx="8" fill="#1e293b" stroke="#475569" strokeWidth="2" />
+            {/* Triangular Cowcatcher (front bottom) */}
+            <polygon points="36,12 46,18 36,18" fill="#475569" stroke="#334155" strokeWidth="1" />
             
-            {/* Cabin (rear, left) */}
-            <rect x="-62" y="-21" width="39" height="42" rx="5" fill="#0f172a" stroke="#475569" strokeWidth="1.5" />
-            <rect x="-49" y="-16" width="18" height="32" rx="2" fill="#38bdf8" opacity="0.75" />
+            {/* Cabin (rear left) */}
+            <rect x="-45" y="-22" width="30" height="38" rx="3" fill="#1e293b" stroke="#334155" strokeWidth="1.5" />
+            {/* Cabin roof overhang */}
+            <path d="M -48,-22 L -12,-22 L -15,-25 L -48,-25 Z" fill="#0f172a" />
+            {/* Cabin Window */}
+            <rect x="-35" y="-14" width="12" height="14" rx="2" fill="#38bdf8" opacity="0.7" stroke="#0f172a" strokeWidth="1" />
+            {/* Cabin door line */}
+            <line x1="-20" y1="-22" x2="-20" y2="16" stroke="#334155" strokeWidth="1" />
+
+            {/* Boiler (middle front) */}
+            <rect x="-15" y="-10" width="50" height="26" rx="4" fill="url(#boilerGradient)" stroke="#334155" strokeWidth="1.5" />
+            {/* Boiler dome 1 (steam dome) */}
+            <path d="M -5,-10 Q -5,-17 0,-17 Q 5,-17 5,-10 Z" fill="#d97706" />
+            {/* Boiler dome 2 (sand dome) */}
+            <path d="M 12,-10 Q 12,-15 15,-15 Q 18,-15 18,-10 Z" fill="#475569" />
+
+            {/* Brass Bands on Boiler */}
+            <line x1="-5" y1="-10" x2="-5" y2="16" stroke="#d97706" strokeWidth="2" />
+            <line x1="10" y1="-10" x2="10" y2="16" stroke="#d97706" strokeWidth="2" />
+            <line x1="25" y1="-10" x2="25" y2="16" stroke="#d97706" strokeWidth="2" />
+
+            {/* Smokestack (above the boiler at front) */}
+            <path d="M 24,-10 L 22,-24 L 30,-24 L 28,-10 Z" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+            {/* Smokestack lip */}
+            <rect x="21" y="-26" width="10" height="3" rx="0.5" fill="#d97706" />
+
+            {/* Headlight lamp box */}
+            <rect x="35" y="-4" width="6" height="8" fill="#475569" stroke="#334155" strokeWidth="1" />
+            <circle cx="41" cy="0" r="3.5" fill="#fef08a" />
+
+            {/* Wheel base / frame */}
+            <rect x="-42" y="14" width="76" height="6" fill="#020617" />
+
+            {/* Wheels */}
+            {/* Rear Large Driving Wheels */}
+            <circle cx="-28" cy="18" r="9" fill="#0f172a" stroke="#d97706" strokeWidth="1.5" />
+            <circle cx="-28" cy="18" r="3" fill="#64748b" />
+            <circle cx="-8" cy="18" r="9" fill="#0f172a" stroke="#d97706" strokeWidth="1.5" />
+            <circle cx="-8" cy="18" r="3" fill="#64748b" />
+
+            {/* Front Small Wheels */}
+            <circle cx="14" cy="20" r="5" fill="#0f172a" stroke="#475569" strokeWidth="1.5" />
+            <circle cx="26" cy="20" r="5" fill="#0f172a" stroke="#475569" strokeWidth="1.5" />
+
+            {/* Connecting Pistons and Rods */}
+            <line x1="-28" y1="18" x2="-8" y2="18" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round" />
+            <line x1="-8" y1="18" x2="14" y2="20" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" />
             
-            {/* Boiler (front, right) */}
-            <rect x="-23" y="-17" width="86" height="34" rx="6" fill="url(#boilerGradient)" stroke="#475569" strokeWidth="1.5" />
-            <line x1="6" y1="-17" x2="6" y2="17" stroke="#64748b" strokeWidth="2" />
-            <line x1="32" y1="-17" x2="32" y2="17" stroke="#64748b" strokeWidth="2" />
-            
-            {/* Smokebox */}
-            <rect x="62" y="-13" width="13" height="26" rx="3" fill="#020617" />
-            {/* Headlight bulb */}
-            <circle cx="72" cy="0" r="8" fill="#fef08a" />
-            
-            {/* Smokestack */}
-            <circle cx="36" cy="0" r="9" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
-            
-            {/* Smoke puffs */}
+            {/* Smoke puffs (starting from the smokestack exit at cx=25, cy=-26) */}
             <g>
               <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                <animate attributeName="cy" from="0" to="-18" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0s" />
-                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="cx" from="25" to="-160" dur="1.6s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="cy" from="-26" to="-90" dur="1.6s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="r" from="5" to="38" dur="1.6s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="opacity" values="0; 0.85; 0" keyTimes="0; 0.15; 1" dur="1.6s" repeatCount="indefinite" begin="0s" />
               </circle>
               <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                <animate attributeName="cy" from="0" to="18" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
-                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.25s" />
+                <animate attributeName="cx" from="25" to="-160" dur="1.6s" repeatCount="indefinite" begin="0.27s" />
+                <animate attributeName="cy" from="-26" to="-80" dur="1.6s" repeatCount="indefinite" begin="0.27s" />
+                <animate attributeName="r" from="5" to="38" dur="1.6s" repeatCount="indefinite" begin="0.27s" />
+                <animate attributeName="opacity" values="0; 0.85; 0" keyTimes="0; 0.15; 1" dur="1.6s" repeatCount="indefinite" begin="0.27s" />
               </circle>
               <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                <animate attributeName="cy" from="0" to="-8" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
-                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.5s" />
+                <animate attributeName="cx" from="25" to="-160" dur="1.6s" repeatCount="indefinite" begin="0.54s" />
+                <animate attributeName="cy" from="-26" to="-100" dur="1.6s" repeatCount="indefinite" begin="0.54s" />
+                <animate attributeName="r" from="5" to="38" dur="1.6s" repeatCount="indefinite" begin="0.54s" />
+                <animate attributeName="opacity" values="0; 0.85; 0" keyTimes="0; 0.15; 1" dur="1.6s" repeatCount="indefinite" begin="0.54s" />
               </circle>
               <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                <animate attributeName="cy" from="0" to="8" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
-                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="0.75s" />
+                <animate attributeName="cx" from="25" to="-160" dur="1.6s" repeatCount="indefinite" begin="0.81s" />
+                <animate attributeName="cy" from="-26" to="-75" dur="1.6s" repeatCount="indefinite" begin="0.81s" />
+                <animate attributeName="r" from="5" to="38" dur="1.6s" repeatCount="indefinite" begin="0.81s" />
+                <animate attributeName="opacity" values="0; 0.85; 0" keyTimes="0; 0.15; 1" dur="1.6s" repeatCount="indefinite" begin="0.81s" />
               </circle>
               <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                <animate attributeName="cy" from="0" to="-12" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
-                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.0s" />
+                <animate attributeName="cx" from="25" to="-160" dur="1.6s" repeatCount="indefinite" begin="1.08s" />
+                <animate attributeName="cy" from="-26" to="-95" dur="1.6s" repeatCount="indefinite" begin="1.08s" />
+                <animate attributeName="r" from="5" to="38" dur="1.6s" repeatCount="indefinite" begin="1.08s" />
+                <animate attributeName="opacity" values="0; 0.85; 0" keyTimes="0; 0.15; 1" dur="1.6s" repeatCount="indefinite" begin="1.08s" />
               </circle>
               <circle r="5" fill="#f1f5f9" opacity="0" filter="url(#smoke-blur)">
-                <animate attributeName="cx" from="36" to="-160" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                <animate attributeName="cy" from="0" to="12" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                <animate attributeName="r" from="5" to="34" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
-                <animate attributeName="opacity" values="0; 0.8; 0" keyTimes="0; 0.15; 1" dur="1.5s" repeatCount="indefinite" begin="1.25s" />
+                <animate attributeName="cx" from="25" to="-160" dur="1.6s" repeatCount="indefinite" begin="1.35s" />
+                <animate attributeName="cy" from="-26" to="-85" dur="1.6s" repeatCount="indefinite" begin="1.35s" />
+                <animate attributeName="r" from="5" to="38" dur="1.6s" repeatCount="indefinite" begin="1.35s" />
+                <animate attributeName="opacity" values="0; 0.85; 0" keyTimes="0; 0.15; 1" dur="1.6s" repeatCount="indefinite" begin="1.35s" />
               </circle>
             </g>
 
