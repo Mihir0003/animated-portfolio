@@ -196,19 +196,102 @@ export default function Home() {
 
         {/* Timeline */}
         <div ref={timelineRef} className="relative max-w-[860px] mx-auto">
-          {/* Central Roadmap Line */}
-          <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[4px] bg-white/5 rounded-full" />
-          <div className="absolute top-0 bottom-0 left-6 sm:left-8 w-[4px] bg-gradient-to-b from-accent-3 via-accent-1 to-accent-2 shadow-[0_0_12px_rgba(77,228,255,0.4)] rounded-full" />
+          <style>{`
+            @keyframes smokeDrift {
+              0% {
+                transform: translate(-50%, 0) scale(0.4);
+                opacity: 0;
+              }
+              20% {
+                opacity: 0.6;
+                background: rgba(241, 245, 249, 0.6);
+              }
+              100% {
+                transform: translate(-50%, -28px) scale(2.5);
+                opacity: 0;
+                background: rgba(241, 245, 249, 0);
+              }
+            }
+            .smoke-puff {
+              position: absolute;
+              left: 50%;
+              width: 8px;
+              height: 8px;
+              background: rgba(241, 245, 249, 0.6);
+              border-radius: 50%;
+              filter: blur(1.5px);
+              pointer-events: none;
+            }
+            .smoke-1 { animation: smokeDrift 1.2s infinite ease-out; }
+            .smoke-2 { animation: smokeDrift 1.2s infinite ease-out 0.4s; }
+            .smoke-3 { animation: smokeDrift 1.2s infinite ease-out 0.8s; }
+          `}</style>
 
-          {/* Animated Train (glowing capsule traveling down the track) */}
+          {/* Railroad Track */}
+          <div className="absolute top-0 bottom-0 left-[16px] sm:left-[24px] w-[16px] pointer-events-none">
+            {/* Left Rail */}
+            <div className="absolute left-[2px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#64748b] via-[#94a3b8] to-[#64748b] shadow-[0_0_4px_rgba(255,255,255,0.2)]" />
+            {/* Right Rail */}
+            <div className="absolute right-[2px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#64748b] via-[#94a3b8] to-[#64748b] shadow-[0_0_4px_rgba(255,255,255,0.2)]" />
+            {/* Wooden Sleepers (Ties) */}
+            <div 
+              className="absolute inset-y-0 left-0 right-0 opacity-45"
+              style={{
+                backgroundImage: "repeating-linear-gradient(to bottom, transparent, transparent 12px, #78350f 12px, #78350f 14px)"
+              }}
+            />
+          </div>
+
+          {/* Animated Train (Realistic Steam Locomotive traveling down the track) */}
           <motion.div 
             style={{ top: trainY, translateY: "-50%" }}
-            className="absolute left-6 sm:left-8 w-[8px] h-[36px] -ml-[2px] rounded-full bg-gradient-to-b from-accent-1 via-accent-3 to-accent-2 shadow-[0_0_15px_rgba(77,228,255,0.9),0_0_30px_rgba(77,228,255,0.5)] z-20 flex flex-col justify-between items-center py-1.5"
+            className="absolute left-[12px] sm:left-[20px] w-[24px] h-[48px] z-20 pointer-events-none"
           >
-            {/* Inner window lights of the train */}
-            <div className="w-[2px] h-[4px] bg-white/90 rounded-full shadow-[0_0_4px_white]" />
-            <div className="w-[2px] h-[4px] bg-white/90 rounded-full shadow-[0_0_4px_white]" />
-            <div className="w-[2px] h-[4px] bg-white/90 rounded-full shadow-[0_0_4px_white]" />
+            {/* Smoke stack puffs (positioned near the smokestack at y=36px, drifting upwards/backwards) */}
+            <div className="absolute top-[28px] left-0 right-0 h-1 pointer-events-none">
+              <div className="smoke-puff smoke-1" />
+              <div className="smoke-puff smoke-2" />
+              <div className="smoke-puff smoke-3" />
+            </div>
+
+            {/* Steam Locomotive SVG (Facing Downwards) */}
+            <svg viewBox="0 0 32 64" className="w-[24px] h-[48px] filter drop-shadow-[0_0_8px_rgba(77,228,255,0.4)]">
+              <defs>
+                <linearGradient id="boilerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#1e293b" />
+                  <stop offset="50%" stopColor="#334155" />
+                  <stop offset="100%" stopColor="#0f172a" />
+                </linearGradient>
+                <linearGradient id="headlightGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(254, 240, 138, 0.7)" />
+                  <stop offset="100%" stopColor="rgba(254, 240, 138, 0)" />
+                </linearGradient>
+              </defs>
+
+              {/* Cabin roof / body (rear) */}
+              <rect x="4" y="4" width="24" height="14" rx="1.5" fill="#0f172a" stroke="#475569" strokeWidth="1" />
+              {/* Windows */}
+              <rect x="7" y="7" width="7" height="6" rx="0.5" fill="#38bdf8" opacity="0.65" />
+              <rect x="18" y="7" width="7" height="6" rx="0.5" fill="#38bdf8" opacity="0.65" />
+              
+              {/* Boiler cylinder body */}
+              <rect x="6" y="18" width="20" height="34" rx="2" fill="url(#boilerGrad)" stroke="#475569" strokeWidth="1" />
+              
+              {/* Boiler metal strap bands */}
+              <line x1="6" y1="26" x2="26" y2="26" stroke="#64748b" strokeWidth="1.5" />
+              <line x1="6" y1="36" x2="26" y2="36" stroke="#64748b" strokeWidth="1.5" />
+              
+              {/* Smokebox front plate */}
+              <rect x="8" y="52" width="16" height="6" rx="1" fill="#020617" />
+              
+              {/* Headlight cone of light pointing forward (downwards) */}
+              <polygon points="16,55 0,78 32,78" fill="url(#headlightGrad)" />
+              {/* Headlight bulb */}
+              <circle cx="16" cy="55" r="3.5" fill="#fef08a" />
+              
+              {/* Smokestack opening (top view) */}
+              <circle cx="16" cy="44" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="1" />
+            </svg>
           </motion.div>
 
           {/* Timeline Items */}
