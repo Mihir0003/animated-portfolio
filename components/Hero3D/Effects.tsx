@@ -48,19 +48,19 @@ export const Effects: React.FC = () => {
     const renderPass = new RenderPass(scene, camera);
     comp.addPass(renderPass);
 
-    // 2. High Performance Bloom Pass (Subtle glow)
+    // 2. Subtle Bloom Pass (avoid dark halo artifacts around mesh edges)
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(size.width, size.height),
-      0.35, // strength
-      0.3,  // radius
-      0.88  // threshold
+      0.18, // strength — reduced to avoid edge darkening
+      0.4,  // radius
+      0.92  // threshold — higher = only very bright areas bloom
     );
     comp.addPass(bloomPass);
 
-    // 3. Vignette Pass
+    // 3. Subtle Vignette Pass
     const vignettePass = new ShaderPass(VignetteShader);
-    vignettePass.uniforms["offset"].value = 0.95;
-    vignettePass.uniforms["darkness"].value = 1.2;
+    vignettePass.uniforms["offset"].value = 1.1;
+    vignettePass.uniforms["darkness"].value = 0.9;
     comp.addPass(vignettePass);
 
     return comp;

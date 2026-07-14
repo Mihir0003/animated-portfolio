@@ -156,11 +156,31 @@ const GLTFCharacterInner: React.FC<{
   useEffect(() => {
     if (!scene) return;
 
-    // ── Shadow traversal ──────────────────────────────────────────────────
+    // ── Shadow + material traversal ───────────────────────────────────────
     scene.traverse((node) => {
       if ((node as THREE.Mesh).isMesh) {
-        node.castShadow = true;
-        node.receiveShadow = true;
+        const mesh = node as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.frustumCulled = false;
+
+        // Fix materials to avoid Z-fighting black lines
+        const fixMaterial = (mat: THREE.Material) => {
+          mat.depthWrite = true;
+          mat.needsUpdate = true;
+          // If material is double-sided (common source of black lines), keep it but fix polygonOffset
+          if ((mat as any).side === THREE.DoubleSide) {
+            (mat as any).polygonOffset = true;
+            (mat as any).polygonOffsetFactor = -1;
+            (mat as any).polygonOffsetUnits = -1;
+          }
+        };
+
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach(fixMaterial);
+        } else if (mesh.material) {
+          fixMaterial(mesh.material as THREE.Material);
+        }
       }
     });
 

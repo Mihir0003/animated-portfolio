@@ -6,17 +6,18 @@ import { ContactShadows } from "@react-three/drei";
 export const Lights: React.FC = () => {
   return (
     <>
-      {/* Ambient lighting for soft base illumination */}
-      <ambientLight intensity={0.4} />
+      {/* Ambient lighting — higher intensity prevents dark/black patches on character faces */}
+      <ambientLight intensity={0.8} />
 
       {/* Key Light: Primary illumination source casting soft shadows */}
       <directionalLight
         position={[-3, 5, 4]}
         intensity={3.2}
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-bias={-0.0001}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.005}
+        shadow-normalBias={0.02}
         color="#ecf4ff"
       />
 
@@ -43,12 +44,12 @@ export const Lights: React.FC = () => {
 
       {/* Ground Contact Shadows */}
       <ContactShadows
-        position={[0, -1.25, 0]}
-        opacity={0.7}
-        scale={5.5}
-        blur={2.4}
-        far={1.8}
-        color="#05111f"
+        position={[0, -1.2, 0]}
+        opacity={0.45}
+        scale={4}
+        blur={3.5}
+        far={1.5}
+        color="#020810"
       />
     </>
   );
