@@ -352,6 +352,7 @@ const GLTFCharacterInner: React.FC<{
       initialHipsYRef.current = bones.hips.position.y;
     }
 
+    console.log("[Hero3D] Discovered bones:", Object.keys(bones));
     bonesRef.current = bones;
     cursorCtrl.setBones(bones);
     cursorControllerRef.current = cursorCtrl;
