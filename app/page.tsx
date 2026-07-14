@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Bot, Mail, Linkedin, Github, Phone, MapPin, ExternalLink, Calendar, Award, GraduationCap, ChevronRight, Briefcase } from "lucide-react";
 import ChatBot from "@/components/chatbot/ChatBot";
-import { AIMascot } from "@/components/AIMascot";
 import dynamic from "next/dynamic";
 
 const CharacterCanvas = dynamic(
@@ -814,8 +813,7 @@ export default function Home() {
         </motion.div>
       </footer>
 
-      {/* Floating Interactive AI Mascot */}
-      <AIMascot />
+
 
       {/* Floating RAG Chatbot widget in the bottom-right corner */}
       <ChatBot />
