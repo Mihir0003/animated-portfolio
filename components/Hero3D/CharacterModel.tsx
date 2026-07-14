@@ -129,6 +129,24 @@ export const SilhouettePlaceholder: React.FC<{
 };
 
 // Internal loader component designed to load the GLB and register skeleton tracking
+export interface BoneMappings {
+  head?: string[];
+  neck?: string[];
+  chest?: string[];
+  spine?: string[];
+  eyeLeft?: string[];
+  eyeRight?: string[];
+}
+
+const defaultBoneMappings: Required<BoneMappings> = {
+  head: ["head"],
+  neck: ["neck"],
+  chest: ["spine2", "chest", "upperchest"],
+  spine: ["spine1", "spine", "spine01"],
+  eyeLeft: ["eyeleft", "eye_l", "lefteye"],
+  eyeRight: ["eyeright", "eye_r", "righteye"],
+};
+
 const GLTFCharacterInner: React.FC<{
   modelUrl: string;
   isIntroPlaying: boolean;
@@ -136,6 +154,7 @@ const GLTFCharacterInner: React.FC<{
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
   animControllerRef: React.MutableRefObject<CharacterController | null>;
   cursorControllerRef: React.MutableRefObject<CursorController | null>;
+  boneMappings?: BoneMappings;
 }> = ({
   modelUrl,
   isIntroPlaying,
@@ -143,6 +162,7 @@ const GLTFCharacterInner: React.FC<{
   pointerRef,
   animControllerRef,
   cursorControllerRef,
+  boneMappings,
 }) => {
   const { scene, animations } = useGLTF(modelUrl);
   const groupRef = useRef<THREE.Group>(null);
@@ -158,16 +178,29 @@ const GLTFCharacterInner: React.FC<{
     const cursorController = new CursorController();
     const bones: TrackingBones = {};
 
+    const activeMappings = { ...defaultBoneMappings, ...boneMappings };
+
     // Search and register bones relative to target hierarchy
     scene.traverse((node) => {
       if (node.isObject3D) {
         const name = node.name.toLowerCase();
-        if (name.includes("head") && !name.includes("headwear")) bones.head = node;
-        else if (name.includes("neck")) bones.neck = node;
-        else if (name.includes("spine2") || name.includes("chest")) bones.chest = node;
-        else if (name.includes("spine1") || name.includes("spine")) bones.spine = node;
-        else if (name.includes("eyeleft") || name.includes("eye_l")) bones.eyeLeft = node;
-        else if (name.includes("eyeright") || name.includes("eye_r")) bones.eyeRight = node;
+
+        const matches = (synonyms: string[]) =>
+          synonyms.some((syn) => name.includes(syn));
+
+        if (matches(activeMappings.head) && !name.includes("headwear")) {
+          bones.head = node;
+        } else if (matches(activeMappings.neck)) {
+          bones.neck = node;
+        } else if (matches(activeMappings.chest)) {
+          bones.chest = node;
+        } else if (matches(activeMappings.spine)) {
+          bones.spine = node;
+        } else if (matches(activeMappings.eyeLeft)) {
+          bones.eyeLeft = node;
+        } else if (matches(activeMappings.eyeRight)) {
+          bones.eyeRight = node;
+        }
       }
     });
 
@@ -181,7 +214,7 @@ const GLTFCharacterInner: React.FC<{
       animControllerRef.current = null;
       cursorControllerRef.current = null;
     };
-  }, [scene, animations]);
+  }, [scene, animations, boneMappings]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
@@ -261,6 +294,7 @@ interface CharacterModelProps {
   isIntroPlaying: boolean;
   introProgress: number;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  boneMappings?: BoneMappings;
 }
 
 export const CharacterModel: React.FC<CharacterModelProps> = ({
@@ -268,6 +302,7 @@ export const CharacterModel: React.FC<CharacterModelProps> = ({
   isIntroPlaying,
   introProgress,
   pointerRef,
+  boneMappings,
 }) => {
   const animControllerRef = useRef<CharacterController | null>(null);
   const cursorControllerRef = useRef<CursorController | null>(null);
@@ -296,6 +331,7 @@ export const CharacterModel: React.FC<CharacterModelProps> = ({
         pointerRef={pointerRef}
         animControllerRef={animControllerRef}
         cursorControllerRef={cursorControllerRef}
+        boneMappings={boneMappings}
       />
     </ModelErrorBoundary>
   );

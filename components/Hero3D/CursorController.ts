@@ -17,7 +17,7 @@ export class CursorController {
     eyes: 1.0,   // 100%
     head: 0.9,   // 90%
     neck: 0.6,   // 60%
-    chest: 0.3,  // 30%
+    chest: 0.35, // 35%
     spine: 0.15, // 15%
   };
 
