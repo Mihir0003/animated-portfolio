@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState, Suspense } from "react";
+import React, { useRef, useEffect, useState, useMemo, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -18,6 +18,11 @@ export interface BoneMappings {
 }
 
 export interface AdditionalBones extends TrackingBones {
+  hips?: THREE.Object3D;
+  leftUpLeg?: THREE.Object3D;
+  rightUpLeg?: THREE.Object3D;
+  leftLeg?: THREE.Object3D;
+  rightLeg?: THREE.Object3D;
   leftShoulder?: THREE.Object3D;
   rightShoulder?: THREE.Object3D;
   leftUpperArm?: THREE.Object3D;
@@ -188,11 +193,25 @@ const GLTFCharacterInner: React.FC<{
   const faceMeshesRef = useRef<THREE.Mesh[]>([]);
   const bonesRef = useRef<AdditionalBones>({});
   const opacityRef = useRef(0);
+  const initialHipsYRef = useRef<number | null>(null);
 
   // Periodic blink values
   const blinkTimeRef = useRef(0);
   const blinkDurationRef = useRef(0.15);
   const nextBlinkInRef = useRef(3.0);
+
+  const hasSittingAnim = useMemo(() => {
+    return animations.some((anim) => {
+      const name = anim.name.toLowerCase();
+      return (
+        name.includes("sit") ||
+        name.includes("lie") ||
+        name.includes("relax") ||
+        name.includes("recline") ||
+        name.includes("couch")
+      );
+    });
+  }, [animations]);
 
   useEffect(() => {
     if (!scene) return;
@@ -313,6 +332,10 @@ const GLTFCharacterInner: React.FC<{
         bones.rightForeArm = node;
     });
 
+    if (bones.hips) {
+      initialHipsYRef.current = bones.hips.position.y;
+    }
+
     bonesRef.current = bones;
     cursorCtrl.setBones(bones);
     cursorControllerRef.current = cursorCtrl;
@@ -322,6 +345,7 @@ const GLTFCharacterInner: React.FC<{
       animControllerRef.current = null;
       cursorControllerRef.current = null;
       bonesRef.current = {};
+      initialHipsYRef.current = null;
     };
   }, [scene, animations, boneMappings]);
 
@@ -338,32 +362,75 @@ const GLTFCharacterInner: React.FC<{
     });
   };
 
-  // Default relaxed natural pose (damps dynamically so it doesn't snap)
-  const applyRelaxedPose = (delta: number) => {
+  // Procedural reclining pose (Awwwards Potato Designer style)
+  const applyRecliningPose = (delta: number, time: number) => {
     const bones = bonesRef.current;
     if (!bones) return;
 
-    // Weight on one leg / relaxed stance tilt
-    if (bones.head) {
-      bones.head.rotation.z = THREE.MathUtils.damp(bones.head.rotation.z, 0.04, 2.5, delta);
+    // Hips tilted sideways and back
+    if (bones.hips) {
+      bones.hips.rotation.x = THREE.MathUtils.damp(bones.hips.rotation.x, -0.3, 2.5, delta);
+      bones.hips.rotation.y = THREE.MathUtils.damp(bones.hips.rotation.y, 0.4, 2.5, delta);
+      bones.hips.rotation.z = THREE.MathUtils.damp(bones.hips.rotation.z, -0.6, 2.5, delta);
+      
+      const baseHipsY = initialHipsYRef.current !== null ? initialHipsYRef.current : bones.hips.position.y;
+      bones.hips.position.y = baseHipsY + Math.sin(time * 1.4) * 0.025;
     }
+
+    // Spine and Chest counter-rotating upwards to face the camera
+    if (bones.spine) {
+      bones.spine.rotation.x = THREE.MathUtils.damp(bones.spine.rotation.x, 0.15 + Math.sin(time * 1.4) * 0.01, 2.5, delta);
+      bones.spine.rotation.y = THREE.MathUtils.damp(bones.spine.rotation.y, -0.2, 2.5, delta);
+      bones.spine.rotation.z = THREE.MathUtils.damp(bones.spine.rotation.z, 0.25, 2.5, delta);
+    }
+    if (bones.chest) {
+      bones.chest.rotation.x = THREE.MathUtils.damp(bones.chest.rotation.x, 0.2 + Math.sin(time * 1.4) * 0.015, 2.5, delta);
+      bones.chest.rotation.y = THREE.MathUtils.damp(bones.chest.rotation.y, -0.15, 2.5, delta);
+      bones.chest.rotation.z = THREE.MathUtils.damp(bones.chest.rotation.z, 0.2, 2.5, delta);
+    }
+
+    // Left Arm: propping up the body
     if (bones.leftShoulder) {
-      bones.leftShoulder.rotation.z = THREE.MathUtils.damp(bones.leftShoulder.rotation.z, -0.06, 2.5, delta);
-    }
-    if (bones.rightShoulder) {
-      bones.rightShoulder.rotation.z = THREE.MathUtils.damp(bones.rightShoulder.rotation.z, 0.06, 2.5, delta);
+      bones.leftShoulder.rotation.z = THREE.MathUtils.damp(bones.leftShoulder.rotation.z, -0.15, 2.5, delta);
     }
     if (bones.leftUpperArm) {
-      bones.leftUpperArm.rotation.z = THREE.MathUtils.damp(bones.leftUpperArm.rotation.z, -0.12, 2.5, delta);
-    }
-    if (bones.rightUpperArm) {
-      bones.rightUpperArm.rotation.z = THREE.MathUtils.damp(bones.rightUpperArm.rotation.z, 0.12, 2.5, delta);
+      bones.leftUpperArm.rotation.x = THREE.MathUtils.damp(bones.leftUpperArm.rotation.x, 0.3, 2.5, delta);
+      bones.leftUpperArm.rotation.y = THREE.MathUtils.damp(bones.leftUpperArm.rotation.y, -0.2, 2.5, delta);
+      bones.leftUpperArm.rotation.z = THREE.MathUtils.damp(bones.leftUpperArm.rotation.z, -0.7, 2.5, delta);
     }
     if (bones.leftForeArm) {
-      bones.leftForeArm.rotation.y = THREE.MathUtils.damp(bones.leftForeArm.rotation.y, 0.2, 2.5, delta);
+      bones.leftForeArm.rotation.y = THREE.MathUtils.damp(bones.leftForeArm.rotation.y, 0.8, 2.5, delta);
+    }
+
+    // Right Arm: resting casually
+    if (bones.rightShoulder) {
+      bones.rightShoulder.rotation.z = THREE.MathUtils.damp(bones.rightShoulder.rotation.z, 0.15, 2.5, delta);
+    }
+    if (bones.rightUpperArm) {
+      bones.rightUpperArm.rotation.x = THREE.MathUtils.damp(bones.rightUpperArm.rotation.x, -0.15, 2.5, delta);
+      bones.rightUpperArm.rotation.y = THREE.MathUtils.damp(bones.rightUpperArm.rotation.y, 0.1, 2.5, delta);
+      bones.rightUpperArm.rotation.z = THREE.MathUtils.damp(bones.rightUpperArm.rotation.z, 0.6, 2.5, delta);
     }
     if (bones.rightForeArm) {
-      bones.rightForeArm.rotation.y = THREE.MathUtils.damp(bones.rightForeArm.rotation.y, -0.2, 2.5, delta);
+      bones.rightForeArm.rotation.y = THREE.MathUtils.damp(bones.rightForeArm.rotation.y, -0.3, 2.5, delta);
+    }
+
+    // Legs (left extended, right bent)
+    if (bones.leftUpLeg) {
+      bones.leftUpLeg.rotation.x = THREE.MathUtils.damp(bones.leftUpLeg.rotation.x, 0.3, 2.5, delta);
+      bones.leftUpLeg.rotation.y = THREE.MathUtils.damp(bones.leftUpLeg.rotation.y, -0.2, 2.5, delta);
+      bones.leftUpLeg.rotation.z = THREE.MathUtils.damp(bones.leftUpLeg.rotation.z, 0.1, 2.5, delta);
+    }
+    if (bones.rightUpLeg) {
+      bones.rightUpLeg.rotation.x = THREE.MathUtils.damp(bones.rightUpLeg.rotation.x, -0.5, 2.5, delta);
+      bones.rightUpLeg.rotation.y = THREE.MathUtils.damp(bones.rightUpLeg.rotation.y, 0.3, 2.5, delta);
+      bones.rightUpLeg.rotation.z = THREE.MathUtils.damp(bones.rightUpLeg.rotation.z, 0.4, 2.5, delta);
+    }
+    if (bones.leftLeg) {
+      bones.leftLeg.rotation.x = THREE.MathUtils.damp(bones.leftLeg.rotation.x, 0.05, 2.5, delta);
+    }
+    if (bones.rightLeg) {
+      bones.rightLeg.rotation.x = THREE.MathUtils.damp(bones.rightLeg.rotation.x, 1.1, 2.5, delta);
     }
   };
 
@@ -391,7 +458,7 @@ const GLTFCharacterInner: React.FC<{
       } else if (introProgress <= timelineConfig.breathEnd) {
         targetOpacity = 1.0;
         posY = -0.9 + Math.sin(time * 1.4) * 0.02;
-        animControllerRef.current?.fadeTo("idle", 0.6);
+        if (hasSittingAnim) animControllerRef.current?.fadeTo("sit", 0.6);
       } else if (introProgress <= timelineConfig.blinkEnd) {
         targetOpacity = 1.0;
         posY = -0.9 + Math.sin(time * 1.4) * 0.02;
@@ -429,6 +496,13 @@ const GLTFCharacterInner: React.FC<{
       groupRef.current.position.set(0, posY, 0);
       groupRef.current.scale.setScalar(1);
 
+      // Apply reclining pose during intro
+      if (!hasSittingAnim) {
+        applyRecliningPose(delta, time);
+      } else {
+        animControllerRef.current?.fadeTo("sit", 0.6);
+      }
+
     // ── 2. Interactive Mode ──────────────────────────────────────────────────
     } else {
       // Natural random eye blinking
@@ -454,11 +528,30 @@ const GLTFCharacterInner: React.FC<{
       // Breathing idle float
       groupRef.current.position.y = -0.9 + Math.sin(time * 1.4) * 0.035;
 
-      // Relax shoulders/arms
-      applyRelaxedPose(delta);
+      if (hasSittingAnim) {
+        animControllerRef.current?.fadeTo("sit", 0.5);
+      } else {
+        // Apply procedural reclining pose
+        applyRecliningPose(delta, time);
+      }
 
       // Skeletal bone tracking based on mouse movements
       cursorControllerRef.current?.update(pointerRef.current, delta);
+
+      // Apply neck/head offsets to look at camera when in procedural reclining pose
+      if (!hasSittingAnim) {
+        const bones = bonesRef.current;
+        if (bones) {
+          if (bones.neck) {
+            bones.neck.rotation.y += -0.25;
+            bones.neck.rotation.z += 0.35;
+          }
+          if (bones.head) {
+            bones.head.rotation.y += -0.2;
+            bones.head.rotation.z += 0.25;
+          }
+        }
+      }
     }
   });
 
