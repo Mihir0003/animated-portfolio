@@ -113,7 +113,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-            className="w-full h-[360px] sm:h-[480px] lg:h-[600px] order-1 md:order-2 lg:absolute lg:right-0 lg:top-[50%] lg:-translate-y-[50%] lg:w-[50%] z-0"
+            className="w-full h-[360px] sm:h-[480px] lg:h-full order-1 md:order-2 lg:absolute lg:-right-10 lg:top-0 lg:bottom-0 lg:w-[58%] z-0"
           >
             <CharacterCanvas />
           </motion.div>
