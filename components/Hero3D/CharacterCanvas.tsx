@@ -15,8 +15,47 @@ import { createHeroTimeline, DEFAULT_TIMELINE_CONFIG } from "./HeroTimeline";
 import { useCursor } from "@/hooks/useCursor";
 import { useIntroAnimation } from "@/hooks/useIntroAnimation";
 
-export const CharacterCanvas: React.FC = () => {
+interface CharacterCanvasProps {
+  hoveredNav?: string | null;
+}
+
+export const CharacterCanvas: React.FC<CharacterCanvasProps> = ({ hoveredNav = null }) => {
   const pointer = useCursor();
+  const [chestPos, setChestPos] = useState({ x: 0, y: 0 });
+  const [navRects, setNavRects] = useState<Record<string, { x: number; y: number }>>({});
+
+  useEffect(() => {
+    const updateCoords = () => {
+      const isMobile = window.innerWidth < 768;
+      // Coordinates of character chest on screen
+      const x = isMobile ? window.innerWidth * 0.5 : window.innerWidth * 0.72;
+      const y = isMobile ? window.innerHeight * 0.65 : window.innerHeight * 0.55;
+      setChestPos({ x, y });
+
+      const newRects: Record<string, { x: number; y: number }> = {};
+      ["hero", "experience", "projects", "contact"].forEach((id) => {
+        const el = document.getElementById(`nav-${id}`);
+        if (el) {
+          const r = el.getBoundingClientRect();
+          newRects[id] = {
+            x: r.left + r.width / 2,
+            y: r.bottom
+          };
+        }
+      });
+      setNavRects(newRects);
+    };
+
+    updateCoords();
+    window.addEventListener("resize", updateCoords);
+    const interval = setInterval(updateCoords, 500);
+
+    return () => {
+      window.removeEventListener("resize", updateCoords);
+      clearInterval(interval);
+    };
+  }, []);
+
   const {
     isIntroPlaying,
     setIsIntroPlaying,
@@ -114,6 +153,21 @@ export const CharacterCanvas: React.FC = () => {
 
   return (
     <div className="w-full h-full relative select-none overflow-hidden group pointer-events-none">
+      {/* CSS Animation for pulse flows on branches */}
+      <style>{`
+        @keyframes pulse-flow {
+          0% {
+            stroke-dashoffset: 240;
+          }
+          100% {
+            stroke-dashoffset: -240;
+          }
+        }
+        .pulse-path {
+          animation: pulse-flow 1.5s linear infinite;
+        }
+      `}</style>
+
       {/* 3D Viewport Canvas */}
       <Canvas
         shadows
@@ -140,10 +194,72 @@ export const CharacterCanvas: React.FC = () => {
           isIntroPlaying={isIntroPlaying}
           introProgress={introProgress}
           pointerRef={pointer}
+          hoveredNav={hoveredNav}
           onModelLoaded={setModelDimensions}
           timelineConfig={DEFAULT_TIMELINE_CONFIG}
         />
       </Canvas>
+
+      {/* Interactive Glowing Branches SVG Layer */}
+      <svg className="absolute inset-0 w-full h-full z-[1] pointer-events-none">
+        <defs>
+          <filter id="glow-branch" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-branch-intense" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur1" />
+            <feGaussianBlur stdDeviation="3" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur1" />
+              <feMergeNode in="blur2" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {hoveredNav && navRects[hoveredNav] && (
+          <g>
+            {/* Background Branch Line with glow */}
+            <path
+              d={`M ${chestPos.x} ${chestPos.y} C ${chestPos.x} ${(chestPos.y + navRects[hoveredNav].y) / 2}, ${navRects[hoveredNav].x} ${(chestPos.y + navRects[hoveredNav].y) / 2}, ${navRects[hoveredNav].x} ${navRects[hoveredNav].y}`}
+              stroke="#4de4ff"
+              strokeWidth="2.5"
+              fill="none"
+              opacity="0.45"
+              filter="url(#glow-branch)"
+            />
+            {/* Animated Light Pulse */}
+            <path
+              className="pulse-path"
+              d={`M ${chestPos.x} ${chestPos.y} C ${chestPos.x} ${(chestPos.y + navRects[hoveredNav].y) / 2}, ${navRects[hoveredNav].x} ${(chestPos.y + navRects[hoveredNav].y) / 2}, ${navRects[hoveredNav].x} ${navRects[hoveredNav].y}`}
+              stroke="#4de4ff"
+              strokeWidth="4"
+              fill="none"
+              strokeDasharray="25 220"
+              filter="url(#glow-branch-intense)"
+            />
+            {/* Pulsing Target Dot */}
+            <circle
+              cx={navRects[hoveredNav].x}
+              cy={navRects[hoveredNav].y}
+              r="6.5"
+              fill="#4de4ff"
+              filter="url(#glow-branch-intense)"
+              className="animate-ping"
+            />
+            <circle
+              cx={navRects[hoveredNav].x}
+              cy={navRects[hoveredNav].y}
+              r="4.5"
+              fill="#fff"
+            />
+          </g>
+        )}
+      </svg>
 
       {/* Optional: Floating Audio Controls (rendered on top of Canvas) */}
       <div className="absolute bottom-4 right-4 flex items-center gap-2 z-10 pointer-events-auto">

@@ -50,6 +50,7 @@ const useTypewriter = (text: string, speed = 80, delay = 1200) => {
 };
 
 export default function Home() {
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const { displayText, showCursor } = useTypewriter("Mihir Amodwala", 80, 1200);
 
   // Smooth scroll helper
@@ -83,9 +84,16 @@ export default function Home() {
           {["hero", "experience", "projects", "contact"].map((section) => (
             <li key={section}>
               <a
+                id={`nav-${section}`}
                 href={`#${section}`}
                 onClick={(e) => handleScroll(e, section)}
-                className="text-xs uppercase tracking-[0.11em] font-bold text-text-secondary/95 hover:text-white transition-colors relative group py-1"
+                onMouseEnter={() => setHoveredNav(section)}
+                onMouseLeave={() => setHoveredNav(null)}
+                className={`text-xs uppercase tracking-[0.11em] font-bold transition-all duration-300 relative group py-1 block ${
+                  hoveredNav === section 
+                    ? "text-[#4de4ff] scale-110 shadow-[0_0_12px_rgba(77,228,255,0.4)]" 
+                    : "text-text-secondary/95 hover:text-white"
+                }`}
               >
                 {section === "hero" ? "Home" : section === "experience" ? "Experience" : section}
                 <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-accent-1 to-accent-2 scale-x-0 origin-right group-hover:scale-x-100 group-hover:origin-left transition-transform duration-300" />
@@ -98,6 +106,8 @@ export default function Home() {
           <a
             href="#contact"
             onClick={(e) => handleScroll(e, "contact")}
+            onMouseEnter={() => setHoveredNav("contact")}
+            onMouseLeave={() => setHoveredNav(null)}
             className="text-xs px-5 py-2 rounded-full border border-accent-1/30 bg-accent-1/5 text-accent-1 font-orbitron font-semibold uppercase tracking-wider hover:bg-accent-1 hover:text-bg-deep hover:shadow-[0_0_15px_rgba(77,228,255,0.3)] transition-all duration-300 active:scale-95"
           >
             Contact Me
@@ -115,7 +125,7 @@ export default function Home() {
                in the right half, behind the text column.
                pointer-events-none lets clicks pass through to text.       */}
           <div className="absolute inset-0 z-0 pointer-events-none">
-            <CharacterCanvas />
+            <CharacterCanvas hoveredNav={hoveredNav} />
           </div>
 
           {/* Text Column */}

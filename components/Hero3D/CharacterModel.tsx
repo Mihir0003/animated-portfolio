@@ -165,6 +165,7 @@ const GLTFCharacterInner: React.FC<{
   isIntroPlaying: boolean;
   introProgress: number;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  hoveredNav?: string | null;
   animControllerRef: React.MutableRefObject<CharacterController | null>;
   cursorControllerRef: React.MutableRefObject<CursorController | null>;
   boneMappings?: BoneMappings;
@@ -182,10 +183,11 @@ const GLTFCharacterInner: React.FC<{
   isIntroPlaying,
   introProgress,
   pointerRef,
+  hoveredNav = null,
   animControllerRef,
   cursorControllerRef,
   boneMappings,
-  timelineConfig,
+  timelineConfig = DEFAULT_TIMELINE_CONFIG,
   onModelLoaded,
 }) => {
   const { scene, animations } = useGLTF(modelUrl);
@@ -290,8 +292,22 @@ const GLTFCharacterInner: React.FC<{
     const animCtrl = new CharacterController(scene);
     animCtrl.setClips(animations);
     animControllerRef.current = animCtrl;
-    if (!animCtrl.fadeTo("idle", 0) && animations.length > 0) {
-      animCtrl.fadeToClipByIndex(0, 0);
+    
+    const hasSitting = animations.some((anim) => {
+      const name = anim.name.toLowerCase();
+      return (
+        name.includes("sit") ||
+        name.includes("lie") ||
+        name.includes("relax") ||
+        name.includes("recline") ||
+        name.includes("couch")
+      );
+    });
+
+    if (hasSitting) {
+      if (!animCtrl.fadeTo("sit", 0) && animations.length > 0) {
+        animCtrl.fadeToClipByIndex(0, 0);
+      }
     }
 
     // ── 5. Skeleton Discovery ────────────────────────────────────────────────
@@ -530,13 +546,20 @@ const GLTFCharacterInner: React.FC<{
         applyRecliningPose(delta, time);
       }
 
+      // Map hovered navigation target to a 3D looking coordinate in screen space
+      const lookTarget = hoveredNav === "hero" ? { x: -0.25, y: 0.75 }
+                       : hoveredNav === "experience" ? { x: -0.1, y: 0.75 }
+                       : hoveredNav === "projects" ? { x: 0.1, y: 0.75 }
+                       : hoveredNav === "contact" ? { x: 0.28, y: 0.75 }
+                       : pointerRef.current;
+
       // Skeletal bone tracking based on mouse movements with reclining look-at offsets
       const offsets = !hasSittingAnim ? {
         neck: { yaw: -0.25, pitch: 0.2 },
         head: { yaw: -0.2, pitch: 0.15 }
       } : undefined;
 
-      cursorControllerRef.current?.update(pointerRef.current, delta, offsets);
+      cursorControllerRef.current?.update(lookTarget, delta, offsets);
     }
   });
 
@@ -552,6 +575,7 @@ interface CharacterModelProps {
   isIntroPlaying: boolean;
   introProgress: number;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  hoveredNav?: string | null;
   onModelLoaded?: (dims: {
     height: number;
     width: number;
@@ -568,6 +592,7 @@ export const CharacterModel: React.FC<CharacterModelProps> = ({
   isIntroPlaying,
   introProgress,
   pointerRef,
+  hoveredNav = null,
   onModelLoaded,
   boneMappings,
   timelineConfig = DEFAULT_TIMELINE_CONFIG,
@@ -606,6 +631,7 @@ export const CharacterModel: React.FC<CharacterModelProps> = ({
           isIntroPlaying={isIntroPlaying}
           introProgress={introProgress}
           pointerRef={pointerRef}
+          hoveredNav={hoveredNav}
           animControllerRef={animControllerRef}
           cursorControllerRef={cursorControllerRef}
           boneMappings={boneMappings}
