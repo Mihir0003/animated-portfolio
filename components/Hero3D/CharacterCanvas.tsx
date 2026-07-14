@@ -107,7 +107,7 @@ export const CharacterCanvas: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-[380px] sm:h-[480px] md:h-[550px] relative select-none rounded-2xl border border-glass-border/30 bg-[#081525]/30 shadow-[0_12px_40px_rgba(5,17,31,0.5)] backdrop-blur-[3px] overflow-hidden group">
+    <div className="w-full h-full relative select-none overflow-hidden group pointer-events-none">
       {/* 3D Viewport Canvas */}
       <Canvas
         shadows
@@ -116,13 +116,14 @@ export const CharacterCanvas: React.FC = () => {
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
         }}
-        className="w-full h-full"
+        className="w-full h-full pointer-events-none"
       >
         <AdaptiveDpr />
         <CameraRig
           isIntroPlaying={isIntroPlaying}
           introProgress={introProgress}
           shouldShake={shouldShake}
+          pointerRef={pointer}
         />
         <Lights />
         <Environment />
@@ -146,7 +147,7 @@ export const CharacterCanvas: React.FC = () => {
       )}
 
       {/* Audio & Timeline Controls */}
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 z-10">
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 z-10 pointer-events-auto">
         {/* Render audio button only if the MP3 file successfully loaded */}
         {audioAvailable && (
           <button
@@ -176,7 +177,7 @@ export const CharacterCanvas: React.FC = () => {
       {audioAvailable && isMuted && isIntroPlaying && introProgress < 0.2 && (
         <button
           onClick={handleToggleSound}
-          className="absolute inset-0 bg-[#05111f]/60 hover:bg-[#05111f]/50 backdrop-blur-[1px] flex items-center justify-center transition-all duration-300 border border-[#4de4ff]/10 rounded-2xl group/btn cursor-pointer z-20"
+          className="absolute inset-0 bg-[#05111f]/60 hover:bg-[#05111f]/50 backdrop-blur-[1px] flex items-center justify-center transition-all duration-300 pointer-events-auto z-20 group/btn cursor-pointer"
         >
           <div className="bg-[#0b1b2f]/95 border border-[#4de4ff]/40 hover:border-[#4de4ff] text-[#4de4ff] px-5 py-3 rounded-2xl font-orbitron font-semibold text-xs tracking-wider uppercase flex items-center gap-3 shadow-[0_8px_30px_rgba(0,229,255,0.15)] group-hover/btn:shadow-[0_8px_30px_rgba(0,229,255,0.3)] transition-all duration-300 transform group-hover/btn:-translate-y-0.5">
             <Play size={14} className="fill-[#4de4ff]" />

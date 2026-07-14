@@ -8,12 +8,14 @@ interface CameraRigProps {
   isIntroPlaying: boolean;
   introProgress: number;
   shouldShake: boolean;
+  pointerRef: React.MutableRefObject<{ x: number; y: number }>;
 }
 
 export const CameraRig: React.FC<CameraRigProps> = ({
   isIntroPlaying,
   introProgress,
   shouldShake,
+  pointerRef,
 }) => {
   const { camera, size } = useThree();
   const shakeTimeStart = useRef<number | null>(null);
@@ -27,7 +29,7 @@ export const CameraRig: React.FC<CameraRigProps> = ({
   }, [camera]);
 
   useFrame((state) => {
-    const pointer = state.pointer;
+    const pointer = pointerRef.current;
     const time = state.clock.getElapsedTime();
 
     // 1. Responsive Z-dolly offsets based on screen width

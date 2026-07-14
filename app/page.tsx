@@ -106,15 +106,25 @@ export default function Home() {
       </motion.nav>
 
       {/* Hero Section */}
-      <header id="hero" className="min-h-screen max-w-[1120px] mx-auto px-6 flex flex-col justify-center pt-32 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+      <header id="hero" className="min-h-screen max-w-[1120px] mx-auto px-6 flex flex-col justify-center pt-32 pb-16 relative overflow-hidden">
+        <div className="relative w-full flex flex-col lg:block">
+          {/* 3D Interactive Character Container */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+            className="w-full h-[360px] sm:h-[480px] lg:h-[600px] order-1 md:order-2 lg:absolute lg:right-0 lg:top-[50%] lg:-translate-y-[50%] lg:w-[50%] z-0"
+          >
+            <CharacterCanvas />
+          </motion.div>
+
           {/* Text Column */}
-          <div className="lg:col-span-7 flex flex-col items-start gap-4 order-2 lg:order-1">
+          <div className="w-full lg:max-w-[65%] flex flex-col items-start gap-4 order-2 md:order-1 relative z-10 pointer-events-none mt-8 lg:mt-0">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.8 }}
-              className="inline-flex items-center gap-2 border border-accent-1/40 bg-accent-1/10 text-accent-1 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold"
+              className="inline-flex items-center gap-2 border border-accent-1/40 bg-accent-1/10 text-accent-1 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold pointer-events-auto"
             >
               <Bot size={14} className="animate-pulse" />
               Information Technology Student (B.Tech 2026)
@@ -124,7 +134,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="font-orbitron font-extrabold text-4xl sm:text-6xl md:text-7xl leading-[1.08] tracking-wide"
+              className="font-orbitron font-extrabold text-4xl sm:text-6xl md:text-7xl leading-[1.08] tracking-wide pointer-events-auto"
             >
               Hi, I'm{" "}
               <span 
@@ -141,7 +151,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-text-secondary text-base sm:text-xl max-w-[700px] leading-relaxed"
+              className="text-text-secondary text-base sm:text-xl max-w-[700px] leading-relaxed pointer-events-auto"
             >
               I am a full-stack developer with a strong foundation in enterprise systems, certified in Advance Java, and highly skilled in Spring Boot, Python FastAPI, WebSockets, relational database design (MSSQL, MySQL), and modern web engineering. Welcome to my creative portfolio.
             </motion.p>
@@ -150,7 +160,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4"
+              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4 pointer-events-auto"
             >
               <a
                 href="#experience"
@@ -168,18 +178,6 @@ export default function Home() {
               </a>
             </motion.div>
           </div>
-
-          {/* 3D Interactive Character Column */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-            className="lg:col-span-5 w-full order-1 lg:order-2 flex justify-center"
-          >
-            <div className="w-full max-w-[420px] lg:max-w-none">
-              <CharacterCanvas />
-            </div>
-          </motion.div>
         </div>
       </header>
 
