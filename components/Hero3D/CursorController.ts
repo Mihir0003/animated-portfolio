@@ -37,7 +37,14 @@ export class CursorController {
     this.bones = bones;
   }
 
-  update(pointer: { x: number; y: number }, delta: number) {
+  update(
+    pointer: { x: number; y: number },
+    delta: number,
+    offsets?: {
+      neck?: { yaw: number; pitch: number };
+      head?: { yaw: number; pitch: number };
+    }
+  ) {
     // pointer.x and pointer.y are normalized between [-1, 1]
     const targetYaw = pointer.x;
     const targetPitch = pointer.y;
@@ -45,25 +52,32 @@ export class CursorController {
     const dampRotation = (
       bone: THREE.Object3D | undefined,
       weight: number,
-      limit: { yaw: number; pitch: number }
+      limit: { yaw: number; pitch: number },
+      baseYaw: number = 0,
+      basePitch: number = 0
     ) => {
       if (!bone) return;
 
-      // Calculate target yaw (Y) and pitch (X) weighted and clamped
-      const destYaw = THREE.MathUtils.clamp(targetYaw * limit.yaw * weight, -limit.yaw, limit.yaw);
-      // Invert pitch direction so character looks up when pointer goes up
-      const destPitch = THREE.MathUtils.clamp(-targetPitch * limit.pitch * weight, -limit.pitch, limit.pitch);
+      // Calculate target yaw (Y) and pitch (X) weighted and clamped around base offset
+      const destYaw = THREE.MathUtils.clamp(baseYaw + targetYaw * limit.yaw * weight, -limit.yaw + baseYaw, limit.yaw + baseYaw);
+      const destPitch = THREE.MathUtils.clamp(basePitch - targetPitch * limit.pitch * weight, -limit.pitch + basePitch, limit.pitch + basePitch);
 
-      // Smoothly interpolate rotations (frame-rate independent damp)
-      bone.rotation.y = THREE.MathUtils.damp(bone.rotation.y, destYaw, this.dampingFactor, delta);
-      bone.rotation.x = THREE.MathUtils.damp(bone.rotation.x, destPitch, this.dampingFactor, delta);
+      // Smoothly interpolate quaternions using temporary Euler conversion
+      const euler = new THREE.Euler().setFromQuaternion(bone.quaternion, "YXZ");
+      const y = THREE.MathUtils.damp(euler.y, destYaw, this.dampingFactor, delta);
+      const x = THREE.MathUtils.damp(euler.x, destPitch, this.dampingFactor, delta);
+
+      bone.quaternion.setFromEuler(new THREE.Euler(x, y, euler.z, "YXZ"));
     };
+
+    const neckOff = offsets?.neck || { yaw: 0, pitch: 0 };
+    const headOff = offsets?.head || { yaw: 0, pitch: 0 };
 
     // Apply cursor movement calculations down the hierarchy
     dampRotation(this.bones.eyeLeft, this.weights.eyes, this.limits.eyes);
     dampRotation(this.bones.eyeRight, this.weights.eyes, this.limits.eyes);
-    dampRotation(this.bones.head, this.weights.head, this.limits.head);
-    dampRotation(this.bones.neck, this.weights.neck, this.limits.neck);
+    dampRotation(this.bones.head, this.weights.head, this.limits.head, headOff.yaw, headOff.pitch);
+    dampRotation(this.bones.neck, this.weights.neck, this.limits.neck, neckOff.yaw, neckOff.pitch);
     dampRotation(this.bones.chest, this.weights.chest, this.limits.chest);
     dampRotation(this.bones.spine, this.weights.spine, this.limits.spine);
   }

@@ -551,23 +551,13 @@ const GLTFCharacterInner: React.FC<{
         applyRecliningPose(delta, time);
       }
 
-      // Skeletal bone tracking based on mouse movements
-      cursorControllerRef.current?.update(pointerRef.current, delta);
+      // Skeletal bone tracking based on mouse movements with reclining look-at offsets
+      const offsets = !hasSittingAnim ? {
+        neck: { yaw: -0.25, pitch: 0.2 },
+        head: { yaw: -0.2, pitch: 0.15 }
+      } : undefined;
 
-      // Apply neck/head offsets to look at camera when in procedural reclining pose
-      if (!hasSittingAnim) {
-        const bones = bonesRef.current;
-        if (bones) {
-          if (bones.neck) {
-            bones.neck.rotation.y += -0.25;
-            bones.neck.rotation.z += 0.35;
-          }
-          if (bones.head) {
-            bones.head.rotation.y += -0.2;
-            bones.head.rotation.z += 0.25;
-          }
-        }
-      }
+      cursorControllerRef.current?.update(pointerRef.current, delta, offsets);
     }
   });
 
@@ -626,6 +616,7 @@ export const CharacterModel: React.FC<CharacterModelProps> = ({
 
   return (
     <ModelErrorBoundary
+      key={currentUrl}
       currentUrl={currentUrl}
       onTryNextUrl={tryNextUrl}
       fallback={silhouette}
