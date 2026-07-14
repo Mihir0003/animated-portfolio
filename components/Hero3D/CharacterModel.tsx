@@ -379,6 +379,23 @@ const GLTFCharacterInner: React.FC<{
     });
   };
 
+  // Helper to smooth quaternion rotations directly, overriding animated values
+  const dampBoneQuaternion = (
+    bone: THREE.Object3D | undefined,
+    targetX: number,
+    targetY: number,
+    targetZ: number,
+    delta: number,
+    speed: number = 2.5
+  ) => {
+    if (!bone) return;
+    const euler = new THREE.Euler().setFromQuaternion(bone.quaternion, "YXZ");
+    const x = THREE.MathUtils.damp(euler.x, targetX, speed, delta);
+    const y = THREE.MathUtils.damp(euler.y, targetY, speed, delta);
+    const z = THREE.MathUtils.damp(euler.z, targetZ, speed, delta);
+    bone.quaternion.setFromEuler(new THREE.Euler(x, y, z, "YXZ"));
+  };
+
   // Procedural reclining pose (Awwwards Potato Designer style)
   const applyRecliningPose = (delta: number, time: number) => {
     const bones = bonesRef.current;
@@ -386,69 +403,30 @@ const GLTFCharacterInner: React.FC<{
 
     // Hips tilted sideways and back
     if (bones.hips) {
-      bones.hips.rotation.x = THREE.MathUtils.damp(bones.hips.rotation.x, -0.3, 2.5, delta);
-      bones.hips.rotation.y = THREE.MathUtils.damp(bones.hips.rotation.y, 0.4, 2.5, delta);
-      bones.hips.rotation.z = THREE.MathUtils.damp(bones.hips.rotation.z, -0.6, 2.5, delta);
-      
+      dampBoneQuaternion(bones.hips, -0.3, 0.4, -0.6, delta);
       const baseHipsY = initialHipsYRef.current !== null ? initialHipsYRef.current : bones.hips.position.y;
       bones.hips.position.y = baseHipsY + Math.sin(time * 1.4) * 0.025;
     }
 
     // Spine and Chest counter-rotating upwards to face the camera
-    if (bones.spine) {
-      bones.spine.rotation.x = THREE.MathUtils.damp(bones.spine.rotation.x, 0.15 + Math.sin(time * 1.4) * 0.01, 2.5, delta);
-      bones.spine.rotation.y = THREE.MathUtils.damp(bones.spine.rotation.y, -0.2, 2.5, delta);
-      bones.spine.rotation.z = THREE.MathUtils.damp(bones.spine.rotation.z, 0.25, 2.5, delta);
-    }
-    if (bones.chest) {
-      bones.chest.rotation.x = THREE.MathUtils.damp(bones.chest.rotation.x, 0.2 + Math.sin(time * 1.4) * 0.015, 2.5, delta);
-      bones.chest.rotation.y = THREE.MathUtils.damp(bones.chest.rotation.y, -0.15, 2.5, delta);
-      bones.chest.rotation.z = THREE.MathUtils.damp(bones.chest.rotation.z, 0.2, 2.5, delta);
-    }
+    dampBoneQuaternion(bones.spine, 0.15 + Math.sin(time * 1.4) * 0.01, -0.2, 0.25, delta);
+    dampBoneQuaternion(bones.chest, 0.2 + Math.sin(time * 1.4) * 0.015, -0.15, 0.2, delta);
 
     // Left Arm: propping up the body
-    if (bones.leftShoulder) {
-      bones.leftShoulder.rotation.z = THREE.MathUtils.damp(bones.leftShoulder.rotation.z, -0.15, 2.5, delta);
-    }
-    if (bones.leftUpperArm) {
-      bones.leftUpperArm.rotation.x = THREE.MathUtils.damp(bones.leftUpperArm.rotation.x, 0.3, 2.5, delta);
-      bones.leftUpperArm.rotation.y = THREE.MathUtils.damp(bones.leftUpperArm.rotation.y, -0.2, 2.5, delta);
-      bones.leftUpperArm.rotation.z = THREE.MathUtils.damp(bones.leftUpperArm.rotation.z, -0.7, 2.5, delta);
-    }
-    if (bones.leftForeArm) {
-      bones.leftForeArm.rotation.y = THREE.MathUtils.damp(bones.leftForeArm.rotation.y, 0.8, 2.5, delta);
-    }
+    dampBoneQuaternion(bones.leftShoulder, 0, 0, -0.15, delta);
+    dampBoneQuaternion(bones.leftUpperArm, 0.3, -0.2, -0.7, delta);
+    dampBoneQuaternion(bones.leftForeArm, 0, 0.8, 0, delta);
 
     // Right Arm: resting casually
-    if (bones.rightShoulder) {
-      bones.rightShoulder.rotation.z = THREE.MathUtils.damp(bones.rightShoulder.rotation.z, 0.15, 2.5, delta);
-    }
-    if (bones.rightUpperArm) {
-      bones.rightUpperArm.rotation.x = THREE.MathUtils.damp(bones.rightUpperArm.rotation.x, -0.15, 2.5, delta);
-      bones.rightUpperArm.rotation.y = THREE.MathUtils.damp(bones.rightUpperArm.rotation.y, 0.1, 2.5, delta);
-      bones.rightUpperArm.rotation.z = THREE.MathUtils.damp(bones.rightUpperArm.rotation.z, 0.6, 2.5, delta);
-    }
-    if (bones.rightForeArm) {
-      bones.rightForeArm.rotation.y = THREE.MathUtils.damp(bones.rightForeArm.rotation.y, -0.3, 2.5, delta);
-    }
+    dampBoneQuaternion(bones.rightShoulder, 0, 0, 0.15, delta);
+    dampBoneQuaternion(bones.rightUpperArm, -0.15, 0.1, 0.6, delta);
+    dampBoneQuaternion(bones.rightForeArm, 0, -0.3, 0, delta);
 
     // Legs (left extended, right bent)
-    if (bones.leftUpLeg) {
-      bones.leftUpLeg.rotation.x = THREE.MathUtils.damp(bones.leftUpLeg.rotation.x, 0.3, 2.5, delta);
-      bones.leftUpLeg.rotation.y = THREE.MathUtils.damp(bones.leftUpLeg.rotation.y, -0.2, 2.5, delta);
-      bones.leftUpLeg.rotation.z = THREE.MathUtils.damp(bones.leftUpLeg.rotation.z, 0.1, 2.5, delta);
-    }
-    if (bones.rightUpLeg) {
-      bones.rightUpLeg.rotation.x = THREE.MathUtils.damp(bones.rightUpLeg.rotation.x, -0.5, 2.5, delta);
-      bones.rightUpLeg.rotation.y = THREE.MathUtils.damp(bones.rightUpLeg.rotation.y, 0.3, 2.5, delta);
-      bones.rightUpLeg.rotation.z = THREE.MathUtils.damp(bones.rightUpLeg.rotation.z, 0.4, 2.5, delta);
-    }
-    if (bones.leftLeg) {
-      bones.leftLeg.rotation.x = THREE.MathUtils.damp(bones.leftLeg.rotation.x, 0.05, 2.5, delta);
-    }
-    if (bones.rightLeg) {
-      bones.rightLeg.rotation.x = THREE.MathUtils.damp(bones.rightLeg.rotation.x, 1.1, 2.5, delta);
-    }
+    dampBoneQuaternion(bones.leftUpLeg, 0.3, -0.2, 0.1, delta);
+    dampBoneQuaternion(bones.rightUpLeg, -0.5, 0.3, 0.4, delta);
+    dampBoneQuaternion(bones.leftLeg, 0.05, 0, 0, delta);
+    dampBoneQuaternion(bones.rightLeg, 1.1, 0, 0, delta);
   };
 
   useFrame((state, delta) => {
