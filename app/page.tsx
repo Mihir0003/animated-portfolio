@@ -5,6 +5,12 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Bot, Mail, Linkedin, Github, Phone, MapPin, ExternalLink, Calendar, Award, GraduationCap, ChevronRight, Briefcase } from "lucide-react";
 import ChatBot from "@/components/chatbot/ChatBot";
 import { AIMascot } from "@/components/AIMascot";
+import dynamic from "next/dynamic";
+
+const CharacterCanvas = dynamic(
+  () => import("@/components/Hero3D/CharacterCanvas").then((mod) => mod.CharacterCanvas),
+  { ssr: false }
+);
 
 // Typewriter Hook for Hero Section
 const useTypewriter = (text: string, speed = 80, delay = 1200) => {
@@ -255,64 +261,79 @@ export default function Home() {
       </motion.nav>
 
       {/* Hero Section */}
-      <header id="hero" className="min-h-screen max-w-[1120px] mx-auto px-6 flex flex-col justify-center pt-24 pb-16">
-        <div className="max-w-[800px] flex flex-col items-start gap-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.8 }}
-            className="inline-flex items-center gap-2 border border-accent-1/40 bg-accent-1/10 text-accent-1 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold"
-          >
-            <Bot size={14} className="animate-pulse" />
-            Information Technology Student (B.Tech 2026)
-          </motion.div>
-
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="font-orbitron font-extrabold text-4xl sm:text-6xl md:text-7xl leading-[1.08] tracking-wide"
-          >
-            Hi, I'm{" "}
-            <span 
-              className="gradient-text transition-all"
-              style={{
-                borderRight: showCursor ? "2px solid var(--accent-1)" : "2px solid transparent"
-              }}
+      <header id="hero" className="min-h-screen max-w-[1120px] mx-auto px-6 flex flex-col justify-center pt-32 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+          {/* Text Column */}
+          <div className="lg:col-span-7 flex flex-col items-start gap-4 order-2 lg:order-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.8 }}
+              className="inline-flex items-center gap-2 border border-accent-1/40 bg-accent-1/10 text-accent-1 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold"
             >
-              {displayText}
-            </span>
-          </motion.h1>
+              <Bot size={14} className="animate-pulse" />
+              Information Technology Student (B.Tech 2026)
+            </motion.div>
 
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-text-secondary text-base sm:text-xl max-w-[700px] leading-relaxed"
-          >
-            I am a full-stack developer with a strong foundation in enterprise systems, certified in Advance Java, and highly skilled in Spring Boot, Python FastAPI, WebSockets, relational database design (MSSQL, MySQL), and modern web engineering. Welcome to my creative portfolio.
-          </motion.p>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="font-orbitron font-extrabold text-4xl sm:text-6xl md:text-7xl leading-[1.08] tracking-wide"
+            >
+              Hi, I'm{" "}
+              <span 
+                className="gradient-text transition-all"
+                style={{
+                  borderRight: showCursor ? "2px solid var(--accent-1)" : "2px solid transparent"
+                }}
+              >
+                {displayText}
+              </span>
+            </motion.h1>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4"
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-text-secondary text-base sm:text-xl max-w-[700px] leading-relaxed"
+            >
+              I am a full-stack developer with a strong foundation in enterprise systems, certified in Advance Java, and highly skilled in Spring Boot, Python FastAPI, WebSockets, relational database design (MSSQL, MySQL), and modern web engineering. Welcome to my creative portfolio.
+            </motion.p>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4"
+            >
+              <a
+                href="#experience"
+                onClick={(e) => handleScroll(e, "experience")}
+                className="flex justify-center items-center gap-2 h-13 px-8 rounded-xl font-orbitron font-bold text-sm tracking-wider uppercase bg-gradient-to-r from-accent-1 to-accent-3 text-bg-deep shadow-[0_10px_24px_rgba(52,245,179,0.25)] hover:shadow-[0_14px_30px_rgba(52,245,179,0.35)] hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Explore My Journey <ChevronRight size={16} />
+              </a>
+              <a
+                href="#contact"
+                onClick={(e) => handleScroll(e, "contact")}
+                className="flex justify-center items-center h-13 px-8 rounded-xl font-orbitron font-bold text-sm tracking-wider uppercase border border-white/20 bg-bg-mid/30 hover:border-accent-1/60 hover:bg-bg-mid/50 text-white hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Contact Me
+              </a>
+            </motion.div>
+          </div>
+
+          {/* 3D Interactive Character Column */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+            className="lg:col-span-5 w-full order-1 lg:order-2 flex justify-center"
           >
-            <a
-              href="#experience"
-              onClick={(e) => handleScroll(e, "experience")}
-              className="flex justify-center items-center gap-2 h-13 px-8 rounded-xl font-orbitron font-bold text-sm tracking-wider uppercase bg-gradient-to-r from-accent-1 to-accent-3 text-bg-deep shadow-[0_10px_24px_rgba(52,245,179,0.25)] hover:shadow-[0_14px_30px_rgba(52,245,179,0.35)] hover:-translate-y-0.5 transition-all duration-300"
-            >
-              Explore My Journey <ChevronRight size={16} />
-            </a>
-            <a
-              href="#contact"
-              onClick={(e) => handleScroll(e, "contact")}
-              className="flex justify-center items-center h-13 px-8 rounded-xl font-orbitron font-bold text-sm tracking-wider uppercase border border-white/20 bg-bg-mid/30 hover:border-accent-1/60 hover:bg-bg-mid/50 text-white hover:-translate-y-0.5 transition-all duration-300"
-            >
-              Contact Me
-            </a>
+            <div className="w-full max-w-[420px] lg:max-w-none">
+              <CharacterCanvas />
+            </div>
           </motion.div>
         </div>
       </header>
