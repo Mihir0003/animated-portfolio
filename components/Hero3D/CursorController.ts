@@ -49,7 +49,7 @@ export class CursorController {
     const targetYaw = pointer.x;
     const targetPitch = pointer.y;
 
-    const dampRotation = (
+    const slerpRotation = (
       bone: THREE.Object3D | undefined,
       weight: number,
       limit: { yaw: number; pitch: number },
@@ -62,23 +62,20 @@ export class CursorController {
       const destYaw = THREE.MathUtils.clamp(baseYaw + targetYaw * limit.yaw * weight, -limit.yaw + baseYaw, limit.yaw + baseYaw);
       const destPitch = THREE.MathUtils.clamp(basePitch - targetPitch * limit.pitch * weight, -limit.pitch + basePitch, limit.pitch + basePitch);
 
-      // Smoothly interpolate quaternions using temporary Euler conversion
-      const euler = new THREE.Euler().setFromQuaternion(bone.quaternion, "YXZ");
-      const y = THREE.MathUtils.damp(euler.y, destYaw, this.dampingFactor, delta);
-      const x = THREE.MathUtils.damp(euler.x, destPitch, this.dampingFactor, delta);
-
-      bone.quaternion.setFromEuler(new THREE.Euler(x, y, euler.z, "YXZ"));
+      // Smoothly slerp to target quaternion to avoid gimbal lock flips
+      const targetQ = new THREE.Quaternion().setFromEuler(new THREE.Euler(destPitch, destYaw, 0, "YXZ"));
+      bone.quaternion.slerp(targetQ, 0.08);
     };
 
     const neckOff = offsets?.neck || { yaw: 0, pitch: 0 };
     const headOff = offsets?.head || { yaw: 0, pitch: 0 };
 
     // Apply cursor movement calculations down the hierarchy
-    dampRotation(this.bones.eyeLeft, this.weights.eyes, this.limits.eyes);
-    dampRotation(this.bones.eyeRight, this.weights.eyes, this.limits.eyes);
-    dampRotation(this.bones.head, this.weights.head, this.limits.head, headOff.yaw, headOff.pitch);
-    dampRotation(this.bones.neck, this.weights.neck, this.limits.neck, neckOff.yaw, neckOff.pitch);
-    dampRotation(this.bones.chest, this.weights.chest, this.limits.chest);
-    dampRotation(this.bones.spine, this.weights.spine, this.limits.spine);
+    slerpRotation(this.bones.eyeLeft, this.weights.eyes, this.limits.eyes);
+    slerpRotation(this.bones.eyeRight, this.weights.eyes, this.limits.eyes);
+    slerpRotation(this.bones.head, this.weights.head, this.limits.head, headOff.yaw, headOff.pitch);
+    slerpRotation(this.bones.neck, this.weights.neck, this.limits.neck, neckOff.yaw, neckOff.pitch);
+    slerpRotation(this.bones.chest, this.weights.chest, this.limits.chest);
+    slerpRotation(this.bones.spine, this.weights.spine, this.limits.spine);
   }
 }

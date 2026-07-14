@@ -26,11 +26,17 @@ export const CharacterCanvas: React.FC<CharacterCanvasProps> = ({ hoveredNav = n
 
   useEffect(() => {
     const updateCoords = () => {
-      const isMobile = window.innerWidth < 768;
-      // Coordinates of character chest on screen
-      const x = isMobile ? window.innerWidth * 0.5 : window.innerWidth * 0.72;
-      const y = isMobile ? window.innerHeight * 0.65 : window.innerHeight * 0.55;
-      setChestPos({ x, y });
+      const canvasEl = document.querySelector("canvas");
+      let cx = window.innerWidth * 0.72;
+      let cy = window.innerHeight * 0.55;
+
+      if (canvasEl) {
+        const r = canvasEl.getBoundingClientRect();
+        const isMobile = window.innerWidth < 1024;
+        cx = isMobile ? r.left + r.width * 0.5 : r.left + r.width * 0.68;
+        cy = isMobile ? r.top + r.height * 0.56 : r.top + r.height * 0.48;
+      }
+      setChestPos({ x: cx, y: cy });
 
       const newRects: Record<string, { x: number; y: number }> = {};
       ["hero", "experience", "projects", "contact"].forEach((id) => {
@@ -201,7 +207,7 @@ export const CharacterCanvas: React.FC<CharacterCanvasProps> = ({ hoveredNav = n
       </Canvas>
 
       {/* Interactive Glowing Branches SVG Layer */}
-      <svg className="absolute inset-0 w-full h-full z-[1] pointer-events-none">
+      <svg className="fixed inset-0 w-full h-full z-[99] pointer-events-none">
         <defs>
           <filter id="glow-branch" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="3" result="blur" />
