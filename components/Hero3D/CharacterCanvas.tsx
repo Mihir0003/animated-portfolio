@@ -129,7 +129,7 @@ export const CharacterCanvas: React.FC = () => {
         <Environment />
         <Effects />
         <CharacterModel
-          modelUrl="/models/character.glb"
+          modelUrl="/models/model.glb"
           isIntroPlaying={isIntroPlaying}
           introProgress={introProgress}
           pointerRef={pointer}
