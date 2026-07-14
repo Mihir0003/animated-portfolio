@@ -8,12 +8,12 @@ import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import * as THREE from "three";
 
-// Custom Vignette Shader to add subtle cinema frame shading
+// Custom subtle vignette — cinema framing without edge crush
 const VignetteShader = {
   name: "VignetteShader",
   uniforms: {
     tDiffuse: { value: null as THREE.Texture | null },
-    offset: { value: 1.0 },
+    offset:   { value: 1.0 },
     darkness: { value: 1.0 },
   },
   vertexShader: `
@@ -32,7 +32,7 @@ const VignetteShader = {
       vec4 texel = texture2D(tDiffuse, vUv);
       vec2 uv = vUv - vec2(0.5);
       float dist = length(uv);
-      float vigor = smoothstep(offset, offset - 0.45, dist * darkness);
+      float vigor = smoothstep(offset, offset - 0.42, dist * darkness);
       gl_FragColor = vec4(texel.rgb * vigor, texel.a);
     }
   `,
@@ -43,25 +43,25 @@ export const Effects: React.FC = () => {
 
   const composer = useMemo(() => {
     const comp = new EffectComposer(gl);
-    
-    // 1. Rendering Pass
-    const renderPass = new RenderPass(scene, camera);
-    comp.addPass(renderPass);
 
-    // 2. Subtle Bloom Pass (avoid dark halo artifacts around mesh edges)
-    const bloomPass = new UnrealBloomPass(
+    // 1. Base render
+    comp.addPass(new RenderPass(scene, camera));
+
+    // 2. Subtle bloom — glow on bright areas (rim light, accent colours)
+    //    Low strength to avoid dark-halo edge artefacts
+    const bloom = new UnrealBloomPass(
       new THREE.Vector2(size.width, size.height),
-      0.18, // strength — reduced to avoid edge darkening
-      0.4,  // radius
-      0.92  // threshold — higher = only very bright areas bloom
+      0.20,  // strength  — keep low
+      0.50,  // radius    — wide soft glow
+      0.90   // threshold — only very bright pixels bloom
     );
-    comp.addPass(bloomPass);
+    comp.addPass(bloom);
 
-    // 3. Subtle Vignette Pass
-    const vignettePass = new ShaderPass(VignetteShader);
-    vignettePass.uniforms["offset"].value = 1.1;
-    vignettePass.uniforms["darkness"].value = 0.9;
-    comp.addPass(vignettePass);
+    // 3. Vignette — subtle cinema frame
+    const vignette = new ShaderPass(VignetteShader);
+    vignette.uniforms["offset"].value   = 1.1;
+    vignette.uniforms["darkness"].value = 0.85;
+    comp.addPass(vignette);
 
     return comp;
   }, [gl, scene, camera, size]);
@@ -70,7 +70,7 @@ export const Effects: React.FC = () => {
     composer.setSize(size.width, size.height);
   }, [composer, size]);
 
-  // Priority > 0 tells Fiber to skip the default frame rendering and use our composer
+  // Priority 1 → replaces R3F's default render pass
   useFrame(() => {
     composer.render();
   }, 1);

@@ -107,16 +107,16 @@ export default function Home() {
 
       {/* Hero Section */}
       <header id="hero" className="min-h-screen max-w-[1120px] mx-auto px-6 flex flex-col justify-center pt-32 pb-16 relative overflow-hidden">
-        <div className="relative w-full flex flex-col lg:block">
-          {/* 3D Interactive Character Container */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-            className="w-full h-[360px] sm:h-[480px] lg:h-full order-1 md:order-2 lg:absolute lg:-right-10 lg:top-0 lg:bottom-0 lg:w-[58%] z-0"
-          >
+        <div className="relative w-full h-full lg:block">
+
+          {/* ── 3D Character Canvas ─────────────────────────────────────────
+               Fills the ENTIRE Hero area (absolute inset-0).
+               Camera framing (FOV 35°, Z=2.2) places the character
+               in the right half, behind the text column.
+               pointer-events-none lets clicks pass through to text.       */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
             <CharacterCanvas />
-          </motion.div>
+          </div>
 
           {/* Text Column */}
           <div className="w-full lg:max-w-[65%] flex flex-col items-start gap-4 order-2 md:order-1 relative z-10 pointer-events-none mt-8 lg:mt-0">

@@ -16,102 +16,95 @@ export class ModelErrorBoundary extends React.Component<
     super(props);
     this.state = { hasError: false };
   }
-
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-
   componentDidCatch(error: any) {
-    console.warn("[CharacterModel] Failed to load GLB. Showing silhouette.", error);
+    console.warn("[Hero3D] GLB failed to load — silhouette displayed.", error);
   }
-
   render() {
     if (this.state.hasError) return this.props.fallback;
     return this.props.children;
   }
 }
 
-// ─── Silhouette Placeholder (rendered when no GLB exists yet) ─────────────────
+// ─── Silhouette Placeholder ───────────────────────────────────────────────────
 export const SilhouettePlaceholder: React.FC<{
-  isIntroPlaying: boolean;
   introProgress: number;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
-}> = ({ isIntroPlaying, introProgress, pointerRef }) => {
+}> = ({ introProgress, pointerRef }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const headRef = useRef<THREE.Mesh>(null);
-  const chestRef = useRef<THREE.Mesh>(null);
+  const matRef = useRef<THREE.MeshStandardMaterial>(null);
 
   useFrame((state) => {
-    if (!groupRef.current) return;
+    if (!groupRef.current || !matRef.current) return;
     const time = state.clock.getElapsedTime();
-    const floatY = Math.sin(time * 1.5) * 0.04;
-
-    if (isIntroPlaying) {
-      let jumpY = 0;
-      let jumpZ = 0;
-      if (introProgress >= 0.55 && introProgress < 0.8) {
-        const p = (introProgress - 0.55) / 0.25;
-        jumpY = Math.sin(p * Math.PI) * 1.3;
-        jumpZ = p * 2.5;
-      } else if (introProgress >= 0.8) {
-        const p = (introProgress - 0.8) / 0.2;
-        jumpZ = 2.5 - p * 2.5;
-        const squash = Math.sin(p * Math.PI) * 0.18 * (1 - p);
-        groupRef.current.scale.set(1 + squash * 0.15, 1 - squash, 1 + squash * 0.15);
-      } else {
-        groupRef.current.scale.setScalar(1);
-      }
-      groupRef.current.position.y = -1.0 + floatY + jumpY;
-      groupRef.current.position.z = jumpZ;
-    } else {
-      groupRef.current.scale.setScalar(1);
-      groupRef.current.position.y = -1.0 + floatY;
-      groupRef.current.position.z = 0;
-
-      const ty = pointerRef.current.x * 0.35;
-      const tx = -pointerRef.current.y * 0.2;
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, ty, 0.05);
-      if (headRef.current) {
-        headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, ty * 0.6, 0.1);
-        headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, tx * 0.6, 0.1);
-      }
-      if (chestRef.current) {
-        chestRef.current.rotation.y = THREE.MathUtils.lerp(chestRef.current.rotation.y, ty * 0.3, 0.08);
-      }
-    }
+    // Fade in with intro
+    matRef.current.opacity = Math.min(introProgress / 0.45, 1);
+    // Gentle breathing float
+    groupRef.current.position.y = Math.sin(time * 1.4) * 0.03;
+    // Pointer rotation
+    const ty = pointerRef.current.x * 0.3;
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(
+      groupRef.current.rotation.y,
+      ty,
+      0.05
+    );
   });
 
+  const sharedMat = (
+    <meshStandardMaterial
+      ref={matRef}
+      color="#1a2a40"
+      roughness={0.4}
+      metalness={0.3}
+      transparent
+      opacity={0}
+    />
+  );
+
   return (
-    <group ref={groupRef} position={[0, -1.0, 0]}>
+    <group ref={groupRef} position={[0, 0, 0]}>
       {/* Torso */}
-      <mesh ref={chestRef} position={[0, 0.6, 0]}>
-        <cylinderGeometry args={[0.3, 0.18, 1.0, 16]} />
-        <meshBasicMaterial color="#0f172a" />
+      <mesh position={[0, 0.6, 0]}>
+        <cylinderGeometry args={[0.28, 0.18, 1.0, 20]} />
+        {sharedMat}
       </mesh>
       {/* Neck */}
       <mesh position={[0, 1.15, 0]}>
         <cylinderGeometry args={[0.07, 0.09, 0.18, 16]} />
-        <meshBasicMaterial color="#090d16" />
+        {sharedMat}
       </mesh>
       {/* Head */}
-      <mesh ref={headRef} position={[0, 1.4, 0]}>
-        <sphereGeometry args={[0.22, 32, 32]} />
-        <meshBasicMaterial color="#111c2a" />
+      <mesh position={[0, 1.42, 0]}>
+        <sphereGeometry args={[0.23, 32, 32]} />
+        {sharedMat}
       </mesh>
-      {/* Arms */}
-      <mesh position={[-0.45, 0.6, 0]}>
-        <capsuleGeometry args={[0.09, 0.6, 8, 16]} />
-        <meshBasicMaterial color="#0b1320" />
+      {/* Left arm */}
+      <mesh position={[-0.44, 0.58, 0]} rotation={[0, 0, 0.08]}>
+        <capsuleGeometry args={[0.085, 0.6, 8, 16]} />
+        {sharedMat}
       </mesh>
-      <mesh position={[0.45, 0.6, 0]}>
-        <capsuleGeometry args={[0.09, 0.6, 8, 16]} />
-        <meshBasicMaterial color="#0b1320" />
+      {/* Right arm */}
+      <mesh position={[0.44, 0.58, 0]} rotation={[0, 0, -0.08]}>
+        <capsuleGeometry args={[0.085, 0.6, 8, 16]} />
+        {sharedMat}
+      </mesh>
+      {/* Left leg */}
+      <mesh position={[-0.16, -0.22, 0]}>
+        <capsuleGeometry args={[0.1, 0.62, 8, 16]} />
+        {sharedMat}
+      </mesh>
+      {/* Right leg */}
+      <mesh position={[0.16, -0.22, 0]}>
+        <capsuleGeometry args={[0.1, 0.62, 8, 16]} />
+        {sharedMat}
       </mesh>
     </group>
   );
 };
 
-// ─── Bone Mappings Config ─────────────────────────────────────────────────────
+// ─── Bone Mappings ────────────────────────────────────────────────────────────
 export interface BoneMappings {
   head?: string[];
   neck?: string[];
@@ -121,18 +114,52 @@ export interface BoneMappings {
   eyeRight?: string[];
 }
 
-const defaultBoneMappings: Required<BoneMappings> = {
-  // Covers: Mixamo, Ready Player Me, Blender Rigify, manual rig naming
-  head: ["head", "mixamorighead", "bip001_head", "head_jnt"],
-  neck: ["neck", "mixamoriigneck", "neck_jnt", "bip001_neck"],
-  chest: ["spine2", "chest", "upperchest", "spine_02", "mixamorigspine2", "bip001_spine2", "spine_top"],
-  spine: ["spine1", "spine", "spine_01", "mixamorigspine1", "bip001_spine1", "spine_mid"],
-  eyeLeft: ["eyeleft", "eye_l", "lefteye", "mixamoriglefteyelid", "eye.l"],
-  eyeRight: ["eyeright", "eye_r", "righteye", "mixamorigrighteyelid", "eye.r"],
+// Covers Mixamo, Ready Player Me, Blender Rigify, BIP, and custom rigs
+const DEFAULT_BONE_MAPPINGS: Required<BoneMappings> = {
+  head: [
+    "head", "mixamorighead", "bip001_head", "head_jnt",
+    "head_bone", "bone_head", "cc_base_head",
+  ],
+  neck: [
+    "neck", "mixamoriigneck", "neck_jnt", "bip001_neck",
+    "neck_bone", "bone_neck", "cc_base_necktwist01",
+  ],
+  chest: [
+    "spine2", "chest", "upperchest", "spine_02",
+    "mixamorigspine2", "bip001_spine2", "spine_top",
+    "cc_base_spine02", "upperarm",
+  ],
+  spine: [
+    "spine1", "spine", "spine_01", "mixamorigspine1",
+    "bip001_spine1", "spine_mid", "cc_base_spine01",
+  ],
+  eyeLeft: [
+    "eyeleft", "eye_l", "lefteye", "mixamoriglefteyelid",
+    "eye.l", "l_eye", "left_eye", "cc_base_r_eye",
+  ],
+  eyeRight: [
+    "eyeright", "eye_r", "righteye", "mixamorigrighteyelid",
+    "eye.r", "r_eye", "right_eye", "cc_base_l_eye",
+  ],
 };
 
+// ─── Opacity Helper ───────────────────────────────────────────────────────────
+function setSceneOpacity(scene: THREE.Object3D, opacity: number) {
+  scene.traverse((node) => {
+    const mesh = node as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mats = Array.isArray(mesh.material)
+      ? mesh.material
+      : [mesh.material];
+    mats.forEach((m) => {
+      if (!m) return;
+      (m as THREE.MeshStandardMaterial).transparent = true;
+      (m as THREE.MeshStandardMaterial).opacity = opacity;
+    });
+  });
+}
+
 // ─── GLTFCharacterInner ───────────────────────────────────────────────────────
-// This component is wrapped in Suspense so useGLTF suspends correctly.
 const GLTFCharacterInner: React.FC<{
   modelUrl: string;
   isIntroPlaying: boolean;
@@ -152,86 +179,87 @@ const GLTFCharacterInner: React.FC<{
 }) => {
   const { scene, animations } = useGLTF(modelUrl);
   const groupRef = useRef<THREE.Group>(null);
+  const opacityRef = useRef(0);
+  const interactiveRef = useRef(false);
 
   useEffect(() => {
     if (!scene) return;
 
-    // ── Shadow + material traversal ───────────────────────────────────────
+    // ── Material setup ─────────────────────────────────────────────────────
     scene.traverse((node) => {
-      if ((node as THREE.Mesh).isMesh) {
-        const mesh = node as THREE.Mesh;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        mesh.frustumCulled = false;
+      const mesh = node as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.frustumCulled = false;
 
-        // Fix materials to avoid Z-fighting black lines
-        const fixMaterial = (mat: THREE.Material) => {
-          mat.depthWrite = true;
-          mat.needsUpdate = true;
-          // If material is double-sided (common source of black lines), keep it but fix polygonOffset
-          if ((mat as any).side === THREE.DoubleSide) {
-            (mat as any).polygonOffset = true;
-            (mat as any).polygonOffsetFactor = -1;
-            (mat as any).polygonOffsetUnits = -1;
-          }
-        };
-
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach(fixMaterial);
-        } else if (mesh.material) {
-          fixMaterial(mesh.material as THREE.Material);
+      const mats = Array.isArray(mesh.material)
+        ? mesh.material
+        : [mesh.material];
+      mats.forEach((mat) => {
+        if (!mat) return;
+        const m = mat as THREE.MeshStandardMaterial;
+        m.depthWrite = true;
+        m.needsUpdate = true;
+        // Fix Z-fighting on double-sided materials
+        if (m.side === THREE.DoubleSide) {
+          m.polygonOffset = true;
+          m.polygonOffsetFactor = -1;
+          m.polygonOffsetUnits = -1;
         }
-      }
+      });
     });
 
-    // ── Animation controller ──────────────────────────────────────────────
-    const animController = new CharacterController(scene);
-    animController.setClips(animations);
-    animControllerRef.current = animController;
+    // Start fully transparent — fade in during intro
+    setSceneOpacity(scene, 0);
+    opacityRef.current = 0;
+    interactiveRef.current = false;
 
-    // Try playing idle first; if not found, play first available clip
-    const didPlay = animController.fadeTo("idle", 0);
-    if (!didPlay && animations.length > 0) {
-      animController.fadeToClipByIndex(0, 0);
+    // ── Animation controller ───────────────────────────────────────────────
+    const animCtrl = new CharacterController(scene);
+    animCtrl.setClips(animations);
+    animControllerRef.current = animCtrl;
+
+    // Play idle if available, else fallback to first clip
+    if (!animCtrl.fadeTo("idle", 0) && animations.length > 0) {
+      animCtrl.fadeToClipByIndex(0, 0);
     }
 
-    // ── Cursor controller ─────────────────────────────────────────────────
-    const cursorController = new CursorController();
+    console.log("[Hero3D] States:", animCtrl.getAvailableStates());
+
+    // ── Cursor / bone controller ───────────────────────────────────────────
+    const cursorCtrl = new CursorController();
     const bones: TrackingBones = {};
-    const activeMappings = { ...defaultBoneMappings, ...boneMappings };
+    const active = { ...DEFAULT_BONE_MAPPINGS, ...boneMappings };
 
     scene.traverse((node) => {
       if (!node.isObject3D) return;
-      const name = node.name.toLowerCase().replace(/[\s\-\.]/g, "");
-      const matches = (synonyms: string[]) =>
-        synonyms.some((syn) => name.includes(syn.toLowerCase().replace(/[\s\-\.]/g, "")));
+      const raw = node.name.toLowerCase().replace(/[\s\-\.]/g, "");
+      const matches = (syns: string[]) =>
+        syns.some((s) => raw.includes(s.replace(/[\s\-\.]/g, "")));
 
-      // Priority ordering: more specific checks first
-      if (matches(activeMappings.eyeLeft)) {
-        bones.eyeLeft = node;
-      } else if (matches(activeMappings.eyeRight)) {
-        bones.eyeRight = node;
-      } else if (matches(activeMappings.head) && !name.includes("headwear") && !name.includes("hair")) {
+      if (matches(active.eyeLeft))  bones.eyeLeft  = node;
+      else if (matches(active.eyeRight)) bones.eyeRight = node;
+      else if (
+        matches(active.head) &&
+        !raw.includes("headwear") &&
+        !raw.includes("hair")
+      )
         bones.head = node;
-      } else if (matches(activeMappings.neck)) {
-        bones.neck = node;
-      } else if (matches(activeMappings.chest)) {
-        bones.chest = node;
-      } else if (matches(activeMappings.spine)) {
-        bones.spine = node;
-      }
+      else if (matches(active.neck))  bones.neck  = node;
+      else if (matches(active.chest)) bones.chest = node;
+      else if (matches(active.spine)) bones.spine = node;
     });
 
-    console.log("[CharacterModel] Bones found:", Object.keys(bones));
-    console.log("[CharacterModel] Animations found:", animations.map(a => a.name));
-
-    cursorController.setBones(bones);
-    cursorControllerRef.current = cursorController;
+    console.log("[Hero3D] Bones found:", Object.keys(bones));
+    cursorCtrl.setBones(bones);
+    cursorControllerRef.current = cursorCtrl;
 
     return () => {
-      animController.destroy();
+      animCtrl.destroy();
       animControllerRef.current = null;
       cursorControllerRef.current = null;
+      interactiveRef.current = false;
     };
   }, [scene, animations, boneMappings]);
 
@@ -239,105 +267,88 @@ const GLTFCharacterInner: React.FC<{
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
 
-    // ── Update animation mixer ────────────────────────────────────────────
+    // Always update animation mixer
     animControllerRef.current?.update(delta);
 
+    // ── INTRO SEQUENCE ───────────────────────────────────────────────────────
     if (isIntroPlaying) {
-      // ── VEBE-STYLE CINEMATIC ENTRANCE ────────────────────────────────────
-      // Phase 0.0–0.05: Off-screen, hidden to the right + below
-      // Phase 0.05–0.62: Fast sweep in from right (expo-style)
-      // Phase 0.62–0.78: Elastic overshoot settle
-      // Phase 0.78–1.0: Final breathing idle position
+      interactiveRef.current = false;
 
-      let posX = 0;
-      let posY = -1.0;
-      let posZ = 0;
-      let scaleX = 1, scaleY = 1, scaleZ = 1;
-      let rotY = 0;
+      let targetOpacity = 0;
 
-      if (introProgress <= 0.05) {
-        // Hold off-screen to the right
-        posX = 12.0;
-        posY = -4.0;
-        groupRef.current.position.set(posX, posY, posZ);
-        groupRef.current.scale.setScalar(1);
-        return;
-      }
-
-      if (introProgress > 0.05 && introProgress <= 0.62) {
-        // Fast sweep in — exponential deceleration from far right
-        const p = (introProgress - 0.05) / 0.57; // 0 → 1
-        const ease = 1 - Math.pow(1 - p, 4); // expo.out approximation
-
-        posX = 12.0 * (1 - ease);               // slides from x=12 → x=0
-        posY = -1.0 - (3.0 * (1 - ease));        // rises from y=-4 → y=-1
-
-        // Slight rotation during entry (character tilts as it rushes in)
-        rotY = (1 - ease) * -0.6;               // rotates from -0.6 → 0
-
-        // Horizontal squash as it decelerates
-        const squashX = 1 + (1 - ease) * 0.3;
-        const squashY = 1 - (1 - ease) * 0.15;
-        scaleX = squashX;
-        scaleY = squashY;
-        scaleZ = squashX;
-
-      } else if (introProgress > 0.62 && introProgress <= 0.78) {
-        // Elastic overshoot — briefly goes past center then snaps back
-        const p = (introProgress - 0.62) / 0.16; // 0 → 1
-        const overshoot = Math.sin(p * Math.PI) * -0.4; // dip left then back
-        posX = overshoot;
-        posY = -1.0 + Math.sin(p * Math.PI) * 0.12; // small vertical bounce
-        rotY = overshoot * 0.4;
-
-        // Landing squash
-        const squash = Math.sin(p * Math.PI) * 0.18;
-        scaleX = 1 + squash * 0.8;
-        scaleY = 1 - squash;
-        scaleZ = 1 + squash * 0.8;
-
+      if (introProgress <= 0.45) {
+        // Phase 1: Fade in + rise from below
+        const p = introProgress / 0.45;
+        const ease = 1 - Math.pow(1 - p, 2); // ease-out quad
+        targetOpacity = ease;
+        groupRef.current.position.y = -0.4 * (1 - ease);
+      } else if (introProgress <= 0.75) {
+        // Phase 2: Breathing idle
+        targetOpacity = 1;
+        groupRef.current.position.y = Math.sin(time * 1.4) * 0.025;
+        animControllerRef.current?.fadeTo("idle", 0.8);
       } else {
-        // Settle into idle breathing
-        const p = (introProgress - 0.78) / 0.22;
-        const settle = Math.exp(-p * 5) * Math.sin(p * 18) * (1 - p) * 0.08;
-        posX = settle;
-        posY = -1.0 + Math.sin(time * 1.5) * 0.04;
-        scaleX = 1; scaleY = 1; scaleZ = 1;
-        rotY = settle * 0.5;
+        // Phase 3: Settle to interactive
+        targetOpacity = 1;
+        groupRef.current.position.y = Math.sin(time * 1.4) * 0.03;
       }
 
-      groupRef.current.position.set(posX, posY, posZ);
-      groupRef.current.scale.set(scaleX, scaleY, scaleZ);
-      groupRef.current.rotation.y = rotY;
+      // Smooth opacity ramp (lerp per-frame)
+      opacityRef.current = THREE.MathUtils.lerp(
+        opacityRef.current,
+        targetOpacity,
+        Math.min(delta * 3, 1)
+      );
+      setSceneOpacity(scene, opacityRef.current);
 
-    } else {
-      // ── Interactive cursor-follow mode ────────────────────────────────────
-      animControllerRef.current?.fadeTo("idle", 0.5);
-
-      // Gentle breathing float
-      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 0, 0.08);
-      groupRef.current.position.y = -1.0 + Math.sin(time * 1.5) * 0.05;
+      groupRef.current.position.x = 0;
       groupRef.current.position.z = 0;
       groupRef.current.scale.setScalar(1);
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.08);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(
+        groupRef.current.rotation.y,
+        0,
+        0.08
+      );
 
-      // Bone cursor tracking
+    // ── INTERACTIVE MODE ─────────────────────────────────────────────────────
+    } else {
+      if (!interactiveRef.current) {
+        // First frame of interactive — ensure opacity=1
+        interactiveRef.current = true;
+        opacityRef.current = 1;
+        setSceneOpacity(scene, 1);
+        animControllerRef.current?.fadeTo("idle", 0.5);
+      }
+
+      // Breathing float
+      groupRef.current.position.x = THREE.MathUtils.lerp(
+        groupRef.current.position.x,
+        0,
+        0.06
+      );
+      groupRef.current.position.y = Math.sin(time * 1.4) * 0.03;
+      groupRef.current.position.z = 0;
+      groupRef.current.scale.setScalar(1);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(
+        groupRef.current.rotation.y,
+        0,
+        0.06
+      );
+
+      // Bone cursor follow
       cursorControllerRef.current?.update(pointerRef.current, delta);
     }
   });
 
   return (
-    <group ref={groupRef} position={[0, -1.0, 0]}>
+    <group ref={groupRef} position={[0, 0, 0]}>
       <primitive object={scene} />
     </group>
   );
 };
 
-// ─── Loading Fallback (inside canvas) ────────────────────────────────────────
-const LoadingFallback: React.FC = () => null; // Canvas renders nothing during Suspense
-
-// ─── Public CharacterModel Component ─────────────────────────────────────────
-interface CharacterModelProps {
+// ─── Public CharacterModel ────────────────────────────────────────────────────
+export interface CharacterModelProps {
   modelUrl: string;
   isIntroPlaying: boolean;
   introProgress: number;
@@ -355,17 +366,16 @@ export const CharacterModel: React.FC<CharacterModelProps> = ({
   const animControllerRef = useRef<CharacterController | null>(null);
   const cursorControllerRef = useRef<CursorController | null>(null);
 
-  const silhouette = (
-    <SilhouettePlaceholder
-      isIntroPlaying={isIntroPlaying}
-      introProgress={introProgress}
-      pointerRef={pointerRef}
-    />
-  );
-
   return (
-    <ModelErrorBoundary fallback={silhouette}>
-      <Suspense fallback={<LoadingFallback />}>
+    <ModelErrorBoundary
+      fallback={
+        <SilhouettePlaceholder
+          introProgress={introProgress}
+          pointerRef={pointerRef}
+        />
+      }
+    >
+      <Suspense fallback={null}>
         <GLTFCharacterInner
           modelUrl={modelUrl}
           isIntroPlaying={isIntroPlaying}

@@ -1,66 +1,57 @@
 import gsap from "gsap";
 
 interface TimelineCallbacks {
-  onUpdate: (progress: number) => void;
-  onComplete: () => void;
+  onUpdate:       (progress: number) => void;
+  onComplete:     () => void;
   onLandingImpact: () => void;
 }
 
 /**
- * Cinematic Hero Intro Timeline — Vebe/Codex style dramatic character entrance.
+ * Hero Intro Timeline — Apple / Awwwards premium style
  *
- * Sequence:
- *  0.0s → 0.8s  — Black screen / hold (letterbox bars visible)
- *  0.8s → 2.2s  — Character slides in fast from RIGHT + below (dramatic sweep)
- *  2.2s → 2.6s  — Overshoots position (elastic overshoot)
- *  2.6s → 3.2s  — Settle + landing impact + camera shake
- *  3.2s → 5.0s  — Breathing idle, cursor tracking activates
+ * Total duration: 3.6 seconds
+ *
+ * Phase 1  0.0s – 1.5s  progress 0 → 0.45   Fade-in + rise from below
+ * Phase 2  1.5s – 2.6s  progress 0.45 → 0.75  Breathing idle, cursor activating
+ * Phase 3  2.6s          onLandingImpact        Micro-shake callback
+ * Phase 4  2.6s – 3.6s  progress 0.75 → 1.0   Settle into interactive
  */
-export const createHeroTimeline = (callbacks: TimelineCallbacks): gsap.core.Timeline => {
+export const createHeroTimeline = (
+  callbacks: TimelineCallbacks
+): gsap.core.Timeline => {
   const tl = gsap.timeline({
     paused: true,
-    onUpdate: () => {
-      callbacks.onUpdate(tl.progress());
-    },
-    onComplete: () => {
-      callbacks.onComplete();
-    },
+    onUpdate:  () => callbacks.onUpdate(tl.progress()),
+    onComplete: () => callbacks.onComplete(),
   });
 
-  const dummy = { progress: 0 };
+  const proxy = { p: 0 };
 
-  // 1. Brief cinematic hold — character is off-screen (0s - 0.6s)
-  tl.to(dummy, {
-    progress: 0.05,
-    duration: 0.6,
-    ease: "none",
+  // Phase 1: Character rises and fades in
+  tl.to(proxy, {
+    p: 0.45,
+    duration: 1.5,
+    ease: "power2.out",
+    onUpdate: () => callbacks.onUpdate(proxy.p),
   });
 
-  // 2. Dramatic slide entrance — character sweeps in from right (0.6s - 1.8s)
-  //    Fast, high-energy, cinematic. Like a superhero landing.
-  tl.to(dummy, {
-    progress: 0.62,
-    duration: 1.2,
-    ease: "expo.out",
+  // Phase 2: Breathing idle (smooth, relaxed)
+  tl.to(proxy, {
+    p: 0.75,
+    duration: 1.1,
+    ease: "power1.inOut",
+    onUpdate: () => callbacks.onUpdate(proxy.p),
   });
 
-  // 3. Overshoot bounce — character goes slightly past center then snaps back (1.8s - 2.4s)
-  tl.to(dummy, {
-    progress: 0.78,
-    duration: 0.6,
-    ease: "back.out(2.5)",
-  });
+  // Phase 3: Landing micro-impact
+  tl.add(() => callbacks.onLandingImpact(), "+=0");
 
-  // 4. Landing impact trigger (exactly at 2.4s)
-  tl.add(() => {
-    callbacks.onLandingImpact();
-  }, 2.4);
-
-  // 5. Settle to final idle position (2.4s - 3.8s)
-  tl.to(dummy, {
-    progress: 1.0,
-    duration: 1.4,
-    ease: "elastic.out(1, 0.6)",
+  // Phase 4: Settle into interactive idle
+  tl.to(proxy, {
+    p: 1.0,
+    duration: 1.0,
+    ease: "power2.out",
+    onUpdate: () => callbacks.onUpdate(proxy.p),
   });
 
   return tl;

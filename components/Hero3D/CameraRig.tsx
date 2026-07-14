@@ -18,14 +18,15 @@ export const CameraRig: React.FC<CameraRigProps> = ({
   pointerRef,
 }) => {
   const { camera, size } = useThree();
-  const shakeTimeStart = useRef<number | null>(null);
+  const shakeTimeRef = useRef<number | null>(null);
 
-  // 35° FOV — cinematic perspective, not too wide, not too narrow
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
+      // 35° FOV — cinematic, Apple-keynote feel
+      // Narrower than default (75°) = character appears MUCH larger and closer
       camera.fov = 35;
-      camera.near = 0.1;
-      camera.far = 100;
+      camera.near = 0.01;
+      camera.far = 50;
       camera.updateProjectionMatrix();
     }
   }, [camera]);
@@ -34,77 +35,64 @@ export const CameraRig: React.FC<CameraRigProps> = ({
     const pointer = pointerRef.current;
     const time = state.clock.getElapsedTime();
 
-    // Responsive Z dolly — pull out more on mobile to see full character body
+    // ── Responsive Z distances ──────────────────────────────────────────────
+    // At FOV=35°, camera Z=2.2 → a 1.7-unit character fills ~85% of frame height
+    // This is what makes the character "dominate" the Hero
     const isMobile = size.width < 768;
     const isTablet = size.width >= 768 && size.width < 1024;
-    const defaultZ = isMobile ? 6.5 : isTablet ? 5.2 : 4.8;
-    const initialZ = isMobile ? 10.0 : isTablet ? 8.5 : 7.5;
+    const targetZ  = isMobile ? 4.2 : isTablet ? 3.0 : 2.2;
+    const startZ   = isMobile ? 7.0 : isTablet ? 5.5 : 4.5;
 
-    let targetZ = defaultZ;
-    let shakeOffsetX = 0;
-    let shakeOffsetY = 0;
-
-    // ── Camera Shake on landing impact ──────────────────────────────────────
+    // ── Camera shake on landing ─────────────────────────────────────────────
+    let sx = 0, sy = 0;
     if (shouldShake) {
-      if (shakeTimeStart.current === null) {
-        shakeTimeStart.current = time;
-      }
-      const elapsed = time - shakeTimeStart.current;
-      const duration = 0.8;
-
-      if (elapsed < duration) {
-        const p = elapsed / duration;
-        const decay = Math.exp(-p * 4.5);
-        const intensity = 0.15 * decay;
-        shakeOffsetX = Math.sin(time * 50) * intensity;
-        shakeOffsetY = Math.cos(time * 45) * intensity;
+      if (shakeTimeRef.current === null) shakeTimeRef.current = time;
+      const elapsed = time - shakeTimeRef.current;
+      if (elapsed < 0.6) {
+        const decay = Math.exp(-(elapsed / 0.6) * 5);
+        sx = Math.sin(time * 60) * 0.06 * decay;
+        sy = Math.cos(time * 55) * 0.06 * decay;
       } else {
-        shakeTimeStart.current = null;
+        shakeTimeRef.current = null;
       }
     } else {
-      shakeTimeStart.current = null;
+      shakeTimeRef.current = null;
     }
 
-    // ── Cinematic intro dolly — matches character's slide-in from right ──────
+    // ── Intro: cinematic dolly-in ───────────────────────────────────────────
     if (isIntroPlaying) {
-      if (introProgress <= 0.05) {
-        // Camera offset right — points toward where character will enter
-        camera.position.x = 3.5;
-        camera.position.y = 0.5;
-        camera.position.z = initialZ;
-      } else if (introProgress > 0.05 && introProgress <= 0.62) {
-        // Chase the character as it slides in — camera pans left and pushes in
-        const p = (introProgress - 0.05) / 0.57;
-        const ease = 1 - Math.pow(1 - p, 3);
-        camera.position.x = THREE.MathUtils.lerp(3.5 + shakeOffsetX, shakeOffsetX, ease);
-        camera.position.y = THREE.MathUtils.lerp(0.5, 0.3 + shakeOffsetY, ease);
-        camera.position.z = THREE.MathUtils.lerp(initialZ, defaultZ + 0.5, ease);
-      } else if (introProgress > 0.62 && introProgress <= 0.78) {
-        // Slam forward on landing
-        const p = (introProgress - 0.62) / 0.16;
-        camera.position.x = shakeOffsetX;
-        camera.position.y = 0.3 + shakeOffsetY;
-        camera.position.z = THREE.MathUtils.lerp(defaultZ + 0.5, defaultZ - 0.4, p);
-      } else {
-        // Settle back
-        const p = (introProgress - 0.78) / 0.22;
-        camera.position.x = shakeOffsetX;
-        camera.position.y = 0.3 + shakeOffsetY;
-        camera.position.z = THREE.MathUtils.lerp(defaultZ - 0.4, defaultZ, p);
-      }
-    } else {
-      // ── Interactive parallax mode ──────────────────────────────────────────
-      const destX = pointer.x * 0.45 + shakeOffsetX;
-      const destY = 0.3 + pointer.y * 0.3 + shakeOffsetY;
-      const destZ = defaultZ - Math.abs(pointer.x) * 0.18;
+      let z = targetZ;
 
-      camera.position.x = THREE.MathUtils.lerp(camera.position.x, destX, 0.04);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, destY, 0.04);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, destZ, 0.04);
+      if (introProgress <= 0.45) {
+        // Slow push-in during fade-in
+        const p = introProgress / 0.45;
+        z = THREE.MathUtils.lerp(startZ, targetZ + 0.6, p);
+      } else if (introProgress <= 0.75) {
+        // Continue pushing closer
+        const p = (introProgress - 0.45) / 0.3;
+        z = THREE.MathUtils.lerp(targetZ + 0.6, targetZ + 0.1, p);
+      } else {
+        // Final settle
+        const p = (introProgress - 0.75) / 0.25;
+        z = THREE.MathUtils.lerp(targetZ + 0.1, targetZ, p);
+      }
+
+      camera.position.set(sx, 0.3 + sy, z);
+
+    // ── Interactive: premium subtle parallax ────────────────────────────────
+    } else {
+      // Very subtle — premium portfolios have barely perceptible parallax
+      const destX = pointer.x * 0.2 + sx;
+      const destY = 0.3 + pointer.y * 0.15 + sy;
+      const destZ = targetZ - Math.abs(pointer.x) * 0.08;
+
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, destX, 0.025);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, destY, 0.025);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, destZ, 0.025);
     }
 
-    // Camera always aims at chest/head region of the character
-    camera.lookAt(0, 0.2, 0);
+    // Always look at character's upper-body / chest-neck region
+    camera.lookAt(0, 0.4, 0);
   });
 
   return null;
