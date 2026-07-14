@@ -7,9 +7,14 @@ interface TimelineCallbacks {
 }
 
 /**
- * Creates the cinematic intro GSAP Timeline.
- * Drives a normalized progress variable which R3F components (model, camera)
- * use to animate positions, scales, and triggers.
+ * Cinematic Hero Intro Timeline — Vebe/Codex style dramatic character entrance.
+ *
+ * Sequence:
+ *  0.0s → 0.8s  — Black screen / hold (letterbox bars visible)
+ *  0.8s → 2.2s  — Character slides in fast from RIGHT + below (dramatic sweep)
+ *  2.2s → 2.6s  — Overshoots position (elastic overshoot)
+ *  2.6s → 3.2s  — Settle + landing impact + camera shake
+ *  3.2s → 5.0s  — Breathing idle, cursor tracking activates
  */
 export const createHeroTimeline = (callbacks: TimelineCallbacks): gsap.core.Timeline => {
   const tl = gsap.timeline({
@@ -24,37 +29,38 @@ export const createHeroTimeline = (callbacks: TimelineCallbacks): gsap.core.Time
 
   const dummy = { progress: 0 };
 
-  // 1. Initial Fade In & Idle Breathing (0s - 3.5s)
+  // 1. Brief cinematic hold — character is off-screen (0s - 0.6s)
   tl.to(dummy, {
-    progress: 0.4, // adjusts glasses & look
-    duration: 3.5,
-    ease: "power1.inOut",
+    progress: 0.05,
+    duration: 0.6,
+    ease: "none",
   });
 
-  // 2. Anticipation Pause (3.5s - 4.8s)
+  // 2. Dramatic slide entrance — character sweeps in from right (0.6s - 1.8s)
+  //    Fast, high-energy, cinematic. Like a superhero landing.
   tl.to(dummy, {
-    progress: 0.55, // body rotates/leans back slightly
-    duration: 1.3,
-    ease: "power2.inOut",
+    progress: 0.62,
+    duration: 1.2,
+    ease: "expo.out",
   });
 
-  // 3. Jump Toward Camera (4.8s - 5.8s)
+  // 3. Overshoot bounce — character goes slightly past center then snaps back (1.8s - 2.4s)
   tl.to(dummy, {
-    progress: 0.8, // translate forward & scale up
-    duration: 1.0,
-    ease: "power3.in",
+    progress: 0.78,
+    duration: 0.6,
+    ease: "back.out(2.5)",
   });
 
-  // 4. Landing Impact Beat Trigger (exactly at 5.8s)
+  // 4. Landing impact trigger (exactly at 2.4s)
   tl.add(() => {
     callbacks.onLandingImpact();
-  }, 5.8);
+  }, 2.4);
 
-  // 5. Land & Settle back to interactive center (5.8s - 8.0s)
+  // 5. Settle to final idle position (2.4s - 3.8s)
   tl.to(dummy, {
-    progress: 1.0, // settle position, squash-stretch scale
-    duration: 2.2,
-    ease: "power2.out",
+    progress: 1.0,
+    duration: 1.4,
+    ease: "elastic.out(1, 0.6)",
   });
 
   return tl;

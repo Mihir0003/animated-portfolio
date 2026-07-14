@@ -243,46 +243,83 @@ const GLTFCharacterInner: React.FC<{
     animControllerRef.current?.update(delta);
 
     if (isIntroPlaying) {
-      let jumpY = 0;
-      let jumpZ = 0;
+      // ── VEBE-STYLE CINEMATIC ENTRANCE ────────────────────────────────────
+      // Phase 0.0–0.05: Off-screen, hidden to the right + below
+      // Phase 0.05–0.62: Fast sweep in from right (expo-style)
+      // Phase 0.62–0.78: Elastic overshoot settle
+      // Phase 0.78–1.0: Final breathing idle position
+
+      let posX = 0;
+      let posY = -1.0;
+      let posZ = 0;
       let scaleX = 1, scaleY = 1, scaleZ = 1;
+      let rotY = 0;
 
-      // Try to use the intro / jump clip if available
-      animControllerRef.current?.fadeTo("intro", 0.3);
-
-      if (introProgress < 0.55) {
-        // Gentle pre-intro float
-        groupRef.current.position.y = -1.0 + Math.sin(time * 2.0) * 0.04;
-      } else if (introProgress >= 0.55 && introProgress < 0.8) {
-        // Jump phase
-        const p = (introProgress - 0.55) / 0.25;
-        jumpY = Math.sin(p * Math.PI) * 1.5;
-        jumpZ = p * 2.6;
-        const stretch = Math.sin(p * Math.PI) * 0.12;
-        scaleX = 1 - stretch;
-        scaleY = 1 + stretch * 1.5;
-        scaleZ = 1 + stretch;
-      } else {
-        // Land + squash phase
-        const p = (introProgress - 0.8) / 0.2;
-        const squash = Math.sin(p * Math.PI) * 0.22 * (1 - p);
-        scaleX = 1 + squash * 1.1;
-        scaleY = 1 - squash * 1.4;
-        scaleZ = 1 + squash * 1.1;
-        jumpZ = 2.6 - p * 2.6;
+      if (introProgress <= 0.05) {
+        // Hold off-screen to the right
+        posX = 12.0;
+        posY = -4.0;
+        groupRef.current.position.set(posX, posY, posZ);
+        groupRef.current.scale.setScalar(1);
+        return;
       }
 
-      groupRef.current.position.y = -1.0 + jumpY;
-      groupRef.current.position.z = jumpZ;
+      if (introProgress > 0.05 && introProgress <= 0.62) {
+        // Fast sweep in — exponential deceleration from far right
+        const p = (introProgress - 0.05) / 0.57; // 0 → 1
+        const ease = 1 - Math.pow(1 - p, 4); // expo.out approximation
+
+        posX = 12.0 * (1 - ease);               // slides from x=12 → x=0
+        posY = -1.0 - (3.0 * (1 - ease));        // rises from y=-4 → y=-1
+
+        // Slight rotation during entry (character tilts as it rushes in)
+        rotY = (1 - ease) * -0.6;               // rotates from -0.6 → 0
+
+        // Horizontal squash as it decelerates
+        const squashX = 1 + (1 - ease) * 0.3;
+        const squashY = 1 - (1 - ease) * 0.15;
+        scaleX = squashX;
+        scaleY = squashY;
+        scaleZ = squashX;
+
+      } else if (introProgress > 0.62 && introProgress <= 0.78) {
+        // Elastic overshoot — briefly goes past center then snaps back
+        const p = (introProgress - 0.62) / 0.16; // 0 → 1
+        const overshoot = Math.sin(p * Math.PI) * -0.4; // dip left then back
+        posX = overshoot;
+        posY = -1.0 + Math.sin(p * Math.PI) * 0.12; // small vertical bounce
+        rotY = overshoot * 0.4;
+
+        // Landing squash
+        const squash = Math.sin(p * Math.PI) * 0.18;
+        scaleX = 1 + squash * 0.8;
+        scaleY = 1 - squash;
+        scaleZ = 1 + squash * 0.8;
+
+      } else {
+        // Settle into idle breathing
+        const p = (introProgress - 0.78) / 0.22;
+        const settle = Math.exp(-p * 5) * Math.sin(p * 18) * (1 - p) * 0.08;
+        posX = settle;
+        posY = -1.0 + Math.sin(time * 1.5) * 0.04;
+        scaleX = 1; scaleY = 1; scaleZ = 1;
+        rotY = settle * 0.5;
+      }
+
+      groupRef.current.position.set(posX, posY, posZ);
       groupRef.current.scale.set(scaleX, scaleY, scaleZ);
+      groupRef.current.rotation.y = rotY;
+
     } else {
       // ── Interactive cursor-follow mode ────────────────────────────────────
       animControllerRef.current?.fadeTo("idle", 0.5);
 
       // Gentle breathing float
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 0, 0.08);
       groupRef.current.position.y = -1.0 + Math.sin(time * 1.5) * 0.05;
       groupRef.current.position.z = 0;
       groupRef.current.scale.setScalar(1);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.08);
 
       // Bone cursor tracking
       cursorControllerRef.current?.update(pointerRef.current, delta);

@@ -65,25 +65,33 @@ export const CameraRig: React.FC<CameraRigProps> = ({
       shakeTimeStart.current = null;
     }
 
-    // ── Cinematic intro dolly ────────────────────────────────────────────────
+    // ── Cinematic intro dolly — matches character's slide-in from right ──────
     if (isIntroPlaying) {
-      if (introProgress < 0.55) {
-        // Slow zoom-in
-        const p = introProgress / 0.55;
-        targetZ = THREE.MathUtils.lerp(initialZ, defaultZ + 0.5, p);
-      } else if (introProgress >= 0.55 && introProgress < 0.8) {
-        // Pull back slightly before landing
-        const p = (introProgress - 0.55) / 0.25;
-        targetZ = THREE.MathUtils.lerp(defaultZ + 0.5, defaultZ + 1.0, p);
+      if (introProgress <= 0.05) {
+        // Camera offset right — points toward where character will enter
+        camera.position.x = 3.5;
+        camera.position.y = 0.5;
+        camera.position.z = initialZ;
+      } else if (introProgress > 0.05 && introProgress <= 0.62) {
+        // Chase the character as it slides in — camera pans left and pushes in
+        const p = (introProgress - 0.05) / 0.57;
+        const ease = 1 - Math.pow(1 - p, 3);
+        camera.position.x = THREE.MathUtils.lerp(3.5 + shakeOffsetX, shakeOffsetX, ease);
+        camera.position.y = THREE.MathUtils.lerp(0.5, 0.3 + shakeOffsetY, ease);
+        camera.position.z = THREE.MathUtils.lerp(initialZ, defaultZ + 0.5, ease);
+      } else if (introProgress > 0.62 && introProgress <= 0.78) {
+        // Slam forward on landing
+        const p = (introProgress - 0.62) / 0.16;
+        camera.position.x = shakeOffsetX;
+        camera.position.y = 0.3 + shakeOffsetY;
+        camera.position.z = THREE.MathUtils.lerp(defaultZ + 0.5, defaultZ - 0.4, p);
       } else {
-        // Slam back in on landing
-        const p = (introProgress - 0.8) / 0.2;
-        targetZ = THREE.MathUtils.lerp(defaultZ - 0.5, defaultZ, p);
+        // Settle back
+        const p = (introProgress - 0.78) / 0.22;
+        camera.position.x = shakeOffsetX;
+        camera.position.y = 0.3 + shakeOffsetY;
+        camera.position.z = THREE.MathUtils.lerp(defaultZ - 0.4, defaultZ, p);
       }
-
-      camera.position.x = shakeOffsetX;
-      camera.position.y = 0.3 + shakeOffsetY;
-      camera.position.z = targetZ;
     } else {
       // ── Interactive parallax mode ──────────────────────────────────────────
       const destX = pointer.x * 0.45 + shakeOffsetX;
