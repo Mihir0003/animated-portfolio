@@ -1,58 +1,63 @@
 import gsap from "gsap";
 
+export interface TimelineConfig {
+  duration: number;   // Total duration in seconds (e.g., 6.0 to 8.0)
+  fadeInEnd: number;  // Progress [0-1] where fade-in ends
+  riseEnd: number;    // Progress [0-1] where rise ends
+  breathEnd: number;  // Progress [0-1] where idle breathing phase ends
+  blinkEnd: number;   // Progress [0-1] where blinking phase ends
+  lookEnd: number;    // Progress [0-1] where look-toward-visitor phase ends
+  smileEnd: number;   // Progress [0-1] where smiling phase ends
+  adjustEnd: number;  // Progress [0-1] where future adjust specs/jacket phase ends
+}
+
+export const DEFAULT_TIMELINE_CONFIG: TimelineConfig = {
+  duration: 7.2,      // 7.2 seconds total intro
+  fadeInEnd: 0.15,    // 0% -> 15% (Fade in)
+  riseEnd: 0.32,      // 15% -> 32% (Rise from below)
+  breathEnd: 0.48,    // 32% -> 48% (Gentle breathing)
+  blinkEnd: 0.62,     // 48% -> 62% (Blink eyes)
+  lookEnd: 0.76,      // 62% -> 76% (Look toward visitor)
+  smileEnd: 0.88,     // 76% -> 88% (Smile)
+  adjustEnd: 0.96,    // 88% -> 96% (Adjust specs / pause)
+};
+
 interface TimelineCallbacks {
-  onUpdate:       (progress: number) => void;
-  onComplete:     () => void;
+  onUpdate: (progress: number) => void;
+  onComplete: () => void;
   onLandingImpact: () => void;
 }
 
 /**
- * Hero Intro Timeline — Apple / Awwwards premium style
- *
- * Total duration: 3.6 seconds
- *
- * Phase 1  0.0s – 1.5s  progress 0 → 0.45   Fade-in + rise from below
- * Phase 2  1.5s – 2.6s  progress 0.45 → 0.75  Breathing idle, cursor activating
- * Phase 3  2.6s          onLandingImpact        Micro-shake callback
- * Phase 4  2.6s – 3.6s  progress 0.75 → 1.0   Settle into interactive
+ * Creates the cinematic intro GSAP Timeline.
+ * Drives a normalized progress variable (0 to 1) over a configurable duration.
  */
 export const createHeroTimeline = (
-  callbacks: TimelineCallbacks
+  callbacks: TimelineCallbacks,
+  config: TimelineConfig = DEFAULT_TIMELINE_CONFIG
 ): gsap.core.Timeline => {
   const tl = gsap.timeline({
     paused: true,
-    onUpdate:  () => callbacks.onUpdate(tl.progress()),
-    onComplete: () => callbacks.onComplete(),
+    onComplete: () => {
+      callbacks.onComplete();
+    },
   });
 
-  const proxy = { p: 0 };
+  const proxy = { progress: 0 };
 
-  // Phase 1: Character rises and fades in
   tl.to(proxy, {
-    p: 0.45,
-    duration: 1.5,
-    ease: "power2.out",
-    onUpdate: () => callbacks.onUpdate(proxy.p),
-  });
-
-  // Phase 2: Breathing idle (smooth, relaxed)
-  tl.to(proxy, {
-    p: 0.75,
-    duration: 1.1,
+    progress: 1.0,
+    duration: config.duration,
     ease: "power1.inOut",
-    onUpdate: () => callbacks.onUpdate(proxy.p),
+    onUpdate: () => {
+      callbacks.onUpdate(proxy.progress);
+    },
   });
 
-  // Phase 3: Landing micro-impact
-  tl.add(() => callbacks.onLandingImpact(), "+=0");
-
-  // Phase 4: Settle into interactive idle
-  tl.to(proxy, {
-    p: 1.0,
-    duration: 1.0,
-    ease: "power2.out",
-    onUpdate: () => callbacks.onUpdate(proxy.p),
-  });
+  // Micro impact / camera shake trigger at a configurable moment (e.g. at lookEnd)
+  tl.add(() => {
+    callbacks.onLandingImpact();
+  }, config.lookEnd * config.duration);
 
   return tl;
 };

@@ -8,7 +8,7 @@ import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import * as THREE from "three";
 
-// Custom subtle vignette — cinema framing without edge crush
+// Custom subtle vignette — premium cinema framing
 const VignetteShader = {
   name: "VignetteShader",
   uniforms: {
@@ -41,39 +41,52 @@ const VignetteShader = {
 export const Effects: React.FC = () => {
   const { gl, scene, camera, size } = useThree();
 
+  // Detect mobile devices to disable expensive post-processing compositing loops
+  const isMobile = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    const mobileUA = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    const narrowScreen = size.width < 768;
+    return mobileUA || narrowScreen;
+  }, [size.width]);
+
   const composer = useMemo(() => {
+    if (isMobile) return null; // Bypass composer completely on mobile devices to preserve 60 FPS
+
     const comp = new EffectComposer(gl);
 
-    // 1. Base render
+    // 1. Core render pass
     comp.addPass(new RenderPass(scene, camera));
 
-    // 2. Subtle bloom — glow on bright areas (rim light, accent colours)
-    //    Low strength to avoid dark-halo edge artefacts
+    // 2. High quality bloom pass (subtle glow on highlights)
     const bloom = new UnrealBloomPass(
       new THREE.Vector2(size.width, size.height),
-      0.20,  // strength  — keep low
-      0.50,  // radius    — wide soft glow
-      0.90   // threshold — only very bright pixels bloom
+      0.20,  // strength
+      0.50,  // radius
+      0.90   // threshold
     );
     comp.addPass(bloom);
 
-    // 3. Vignette — subtle cinema frame
+    // 3. Cinematic vignette pass
     const vignette = new ShaderPass(VignetteShader);
     vignette.uniforms["offset"].value   = 1.1;
     vignette.uniforms["darkness"].value = 0.85;
     comp.addPass(vignette);
 
     return comp;
-  }, [gl, scene, camera, size]);
+  }, [gl, scene, camera, size, isMobile]);
 
   useEffect(() => {
-    composer.setSize(size.width, size.height);
+    if (composer) {
+      composer.setSize(size.width, size.height);
+    }
   }, [composer, size]);
 
-  // Priority 1 → replaces R3F's default render pass
+  // If composer is active, priority > 0 tells Fiber to bypass default rendering and use composer
   useFrame(() => {
-    composer.render();
-  }, 1);
+    if (composer) {
+      composer.render();
+    }
+  }, composer ? 1 : 0);
 
   return null;
 };

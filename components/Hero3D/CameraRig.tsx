@@ -9,6 +9,14 @@ interface CameraRigProps {
   introProgress: number;
   shouldShake: boolean;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  modelDimensions: {
+    height: number;
+    width: number;
+    depth: number;
+    center: THREE.Vector3;
+    minY: number;
+    maxY: number;
+  } | null;
 }
 
 export const CameraRig: React.FC<CameraRigProps> = ({
@@ -16,17 +24,15 @@ export const CameraRig: React.FC<CameraRigProps> = ({
   introProgress,
   shouldShake,
   pointerRef,
+  modelDimensions,
 }) => {
   const { camera, size } = useThree();
   const shakeTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
-      // 35° FOV — cinematic, Apple-keynote feel
-      // Narrower than default (75°) = character appears MUCH larger and closer
+      // 35° Field of view for premium cinematic keynote rendering
       camera.fov = 35;
-      camera.near = 0.01;
-      camera.far = 50;
       camera.updateProjectionMatrix();
     }
   }, [camera]);
@@ -35,23 +41,71 @@ export const CameraRig: React.FC<CameraRigProps> = ({
     const pointer = pointerRef.current;
     const time = state.clock.getElapsedTime();
 
-    // ── Responsive Z distances ──────────────────────────────────────────────
-    // At FOV=35°, camera Z=2.2 → a 1.7-unit character fills ~85% of frame height
-    // This is what makes the character "dominate" the Hero
-    const isMobile = size.width < 768;
-    const isTablet = size.width >= 768 && size.width < 1024;
-    const targetZ  = isMobile ? 4.2 : isTablet ? 3.0 : 2.2;
-    const startZ   = isMobile ? 7.0 : isTablet ? 5.5 : 4.5;
+    // Default reference sizing if model hasn't loaded yet
+    let height = 1.8;
+    let width = 0.6;
+    let centerY = 0;
 
-    // ── Camera shake on landing ─────────────────────────────────────────────
+    if (modelDimensions) {
+      height = modelDimensions.height;
+      width = modelDimensions.width;
+      centerY = modelDimensions.center.y;
+    }
+
+    // Target fraction: character occupies ~80% of screen height
+    const targetFraction = 0.8;
+
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+
+    // FOV in radians
+    const fovRad = (camera.fov * Math.PI) / 180;
+    const halfFov = fovRad / 2;
+
+    // Calculate camera distance to fit character height
+    let targetZ = (height / targetFraction) / (2 * Math.tan(halfFov));
+
+    // Responsive aspect checks for portrait layouts (mobiles)
+    const aspect = size.width / size.height;
+    if (aspect < 1) {
+      // Fit by width in portrait to prevent cutting off sides
+      const visibleWidth = width / targetFraction;
+      const distanceForWidth = (visibleWidth / aspect) / (2 * Math.tan(halfFov));
+      targetZ = Math.max(targetZ, distanceForWidth);
+    }
+
+    // Set dynamic near/far clip planes to prevent clipping artifacts
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.near = Math.max(0.01, targetZ * 0.1);
+      camera.far = targetZ * 10;
+      camera.updateProjectionMatrix();
+    }
+
+    // Position lookAt and camera heights
+    const lookAtY = centerY + height * 0.05;
+    const cameraY = centerY + height * 0.08;
+
+    // Calculate camera horizontal pan offset (right positioning for desktop)
+    let targetOffsetX = 0;
+    if (aspect >= 1.2) {
+      // Desktop: offset camera left to place character on right side of screen
+      targetOffsetX = -targetZ * 0.28;
+    } else if (aspect >= 0.8) {
+      // Tablet: offset slightly left so it overlaps background content nicely
+      targetOffsetX = -targetZ * 0.15;
+    } else {
+      // Mobile: keep character centered in viewport
+      targetOffsetX = 0;
+    }
+
+    // ── Screen impact shake ─────────────────────────────────────────────────
     let sx = 0, sy = 0;
     if (shouldShake) {
       if (shakeTimeRef.current === null) shakeTimeRef.current = time;
       const elapsed = time - shakeTimeRef.current;
       if (elapsed < 0.6) {
         const decay = Math.exp(-(elapsed / 0.6) * 5);
-        sx = Math.sin(time * 60) * 0.06 * decay;
-        sy = Math.cos(time * 55) * 0.06 * decay;
+        sx = Math.sin(time * 65) * 0.06 * decay;
+        sy = Math.cos(time * 60) * 0.06 * decay;
       } else {
         shakeTimeRef.current = null;
       }
@@ -59,40 +113,48 @@ export const CameraRig: React.FC<CameraRigProps> = ({
       shakeTimeRef.current = null;
     }
 
-    // ── Intro: cinematic dolly-in ───────────────────────────────────────────
+    // ── Position animations ─────────────────────────────────────────────────
+    let finalX = targetOffsetX;
+    let finalY = cameraY;
+    let finalZ = targetZ;
+
     if (isIntroPlaying) {
-      let z = targetZ;
+      const startZ = targetZ * 1.8; // dolly in from far back
+      const startX = 0;             // start centered
 
       if (introProgress <= 0.45) {
-        // Slow push-in during fade-in
         const p = introProgress / 0.45;
-        z = THREE.MathUtils.lerp(startZ, targetZ + 0.6, p);
+        finalZ = THREE.MathUtils.lerp(startZ, targetZ + 0.6, p);
+        finalX = THREE.MathUtils.lerp(startX, targetOffsetX, p);
       } else if (introProgress <= 0.75) {
-        // Continue pushing closer
         const p = (introProgress - 0.45) / 0.3;
-        z = THREE.MathUtils.lerp(targetZ + 0.6, targetZ + 0.1, p);
+        finalZ = THREE.MathUtils.lerp(targetZ + 0.6, targetZ + 0.1, p);
+        finalX = targetOffsetX;
       } else {
-        // Final settle
         const p = (introProgress - 0.75) / 0.25;
-        z = THREE.MathUtils.lerp(targetZ + 0.1, targetZ, p);
+        finalZ = THREE.MathUtils.lerp(targetZ + 0.1, targetZ, p);
+        finalX = targetOffsetX;
       }
 
-      camera.position.set(sx, 0.3 + sy, z);
-
-    // ── Interactive: premium subtle parallax ────────────────────────────────
+      camera.position.set(finalX + sx, finalY + sy, finalZ);
     } else {
-      // Very subtle — premium portfolios have barely perceptible parallax
-      const destX = pointer.x * 0.2 + sx;
-      const destY = 0.3 + pointer.y * 0.15 + sy;
-      const destZ = targetZ - Math.abs(pointer.x) * 0.08;
+      // ── Interactive premium subtle parallax ────────────────────────────────
+      const destX = targetOffsetX + pointer.x * (targetZ * 0.08) + sx;
+      const destY = cameraY + pointer.y * (height * 0.08) + sy;
+      const destZ = targetZ - Math.abs(pointer.x) * (targetZ * 0.03);
 
-      camera.position.x = THREE.MathUtils.lerp(camera.position.x, destX, 0.025);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, destY, 0.025);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, destZ, 0.025);
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, destX, 0.03);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, destY, 0.03);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, destZ, 0.03);
     }
 
-    // Always look at character's upper-body / chest-neck region
-    camera.lookAt(0, 0.4, 0);
+    // Look at target character height center
+    const currentLookAtY = THREE.MathUtils.lerp(
+      lookAtY - height * 0.1,
+      lookAtY,
+      isIntroPlaying ? introProgress : 1
+    );
+    camera.lookAt(0, currentLookAtY, 0);
   });
 
   return null;

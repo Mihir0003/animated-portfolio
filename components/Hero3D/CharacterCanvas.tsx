@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { AdaptiveDpr } from "@react-three/drei";
-import { Volume2, VolumeX, RotateCcw, Play } from "lucide-react";
+import { Volume2, VolumeX, Play } from "lucide-react";
 import * as THREE from "three";
 import { CameraRig } from "./CameraRig";
 import { Lights } from "./Lights";
@@ -11,7 +11,7 @@ import { Environment } from "./Environment";
 import { Effects } from "./Effects";
 import { CharacterModel } from "./CharacterModel";
 import { AudioController } from "./AudioController";
-import { createHeroTimeline } from "./HeroTimeline";
+import { createHeroTimeline, DEFAULT_TIMELINE_CONFIG } from "./HeroTimeline";
 import { useCursor } from "@/hooks/useCursor";
 import { useIntroAnimation } from "@/hooks/useIntroAnimation";
 
@@ -28,6 +28,14 @@ export const CharacterCanvas: React.FC = () => {
 
   const [isMuted, setIsMuted] = useState(true);
   const [audioAvailable, setAudioAvailable] = useState(false);
+  const [modelDimensions, setModelDimensions] = useState<{
+    height: number;
+    width: number;
+    depth: number;
+    center: THREE.Vector3;
+    minY: number;
+    maxY: number;
+  } | null>(null);
 
   const audioControllerRef = useRef<AudioController | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -37,7 +45,6 @@ export const CharacterCanvas: React.FC = () => {
     const audio = new AudioController("/audio/hero.mp3");
     audioControllerRef.current = audio;
 
-    // Periodically check if sound file becomes playable (canplaythrough event fired)
     const checkAudioAvailability = () => {
       if (audio.getIsAvailable()) {
         setAudioAvailable(true);
@@ -71,7 +78,7 @@ export const CharacterCanvas: React.FC = () => {
       onComplete: () => {
         setIsIntroPlaying(false);
       },
-    });
+    }, DEFAULT_TIMELINE_CONFIG);
 
     timelineRef.current.play();
 
@@ -97,7 +104,6 @@ export const CharacterCanvas: React.FC = () => {
     if (audioControllerRef.current) {
       audioControllerRef.current.setMute(nextMute);
       if (!nextMute) {
-        // Restart cinematic timeline in sync with the audio track
         audioControllerRef.current.stop();
         runTimeline();
       } else {
@@ -115,6 +121,7 @@ export const CharacterCanvas: React.FC = () => {
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
+          alpha: true,
         }}
         className="w-full h-full pointer-events-none"
       >
@@ -124,31 +131,22 @@ export const CharacterCanvas: React.FC = () => {
           introProgress={introProgress}
           shouldShake={shouldShake}
           pointerRef={pointer}
+          modelDimensions={modelDimensions}
         />
         <Lights />
         <Environment />
         <Effects />
         <CharacterModel
-          modelUrl="/models/model.glb"
           isIntroPlaying={isIntroPlaying}
           introProgress={introProgress}
           pointerRef={pointer}
+          onModelLoaded={setModelDimensions}
+          timelineConfig={DEFAULT_TIMELINE_CONFIG}
         />
       </Canvas>
 
-      {/* Floating HUD status indicator overlay */}
-      {!isIntroPlaying && (
-        <div className="absolute top-4 left-4 pointer-events-none bg-[#4de4ff]/10 border border-[#4de4ff]/30 px-3 py-1.5 rounded-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#4de4ff]" />
-            <span className="font-orbitron text-[9px] text-[#4de4ff] uppercase tracking-widest font-semibold">Interactive Mode: Active</span>
-          </div>
-        </div>
-      )}
-
-      {/* Audio & Timeline Controls */}
+      {/* Optional: Floating Audio Controls (rendered on top of Canvas) */}
       <div className="absolute bottom-4 right-4 flex items-center gap-2 z-10 pointer-events-auto">
-        {/* Render audio button only if the MP3 file successfully loaded */}
         {audioAvailable && (
           <button
             onClick={handleToggleSound}
@@ -162,18 +160,9 @@ export const CharacterCanvas: React.FC = () => {
             {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
         )}
-
-        {/* Replay Cinematic Sequence */}
-        <button
-          onClick={runTimeline}
-          className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0b1b2f]/80 border border-white/10 text-white/70 hover:text-white hover:border-white/30 backdrop-blur-md transition-all duration-300 active:scale-95"
-          title="Replay Cinematic Intro"
-        >
-          <RotateCcw size={16} />
-        </button>
       </div>
 
-      {/* Unmute CTA Overlay */}
+      {/* Unmute CTA Overlay (rendered on top of Canvas) */}
       {audioAvailable && isMuted && isIntroPlaying && introProgress < 0.2 && (
         <button
           onClick={handleToggleSound}
@@ -185,18 +174,6 @@ export const CharacterCanvas: React.FC = () => {
           </div>
         </button>
       )}
-
-      {/* Cinematic letterbox templates */}
-      <div
-        className={`absolute inset-x-0 top-0 h-8 bg-black/80 pointer-events-none transition-transform duration-700 z-10 ${
-          isIntroPlaying ? "translate-y-0" : "-translate-y-full"
-        }`}
-      />
-      <div
-        className={`absolute inset-x-0 bottom-0 h-8 bg-black/80 pointer-events-none transition-transform duration-700 z-10 ${
-          isIntroPlaying ? "translate-y-0" : "translate-y-full"
-        }`}
-      />
     </div>
   );
 };

@@ -23,22 +23,23 @@ export class CharacterController {
   setClips(clips: THREE.AnimationClip[]) {
     // Map of semantic state → array of keyword synonyms (case-insensitive)
     const SYNONYMS: Record<string, string[]> = {
-      idle:      ["idle", "breathing", "breath", "rest", "neutral", "stand"],
+      loading:   ["loading", "load"],
       intro:     ["intro", "entrance", "appear", "arrive"],
-      wave:      ["wave", "greet", "greeting", "hello", "hi"],
+      idle:      ["idle", "breathing", "breath", "rest", "neutral", "stand"],
+      blink:     ["blink", "eyeblink"],
+      smile:     ["smile", "grin"],
       thinking:  ["thinking", "think", "ponder", "scratch"],
-      glasses:   ["glasses", "adjust", "sunglasses", "specs"],
+      hover:     ["hover"],
+      wave:      ["wave", "greet", "greeting", "hello", "hi"],
+      point:     ["point", "pointing", "finger"],
+      typing:    ["typing", "type", "code", "coding"],
+      talk:      ["talk", "talking", "speak", "chat"],
+      celebrate: ["celebrate", "cheer", "victory", "win", "thumbsup"],
       jump:      ["jump", "land", "leap", "bounce"],
       walk:      ["walk", "walking", "strut"],
-      run:       ["run", "running", "sprint"],
-      talk:      ["talk", "talking", "speak"],
-      celebrate: ["celebrate", "cheer", "victory", "win"],
-      point:     ["point", "pointing", "finger"],
-      type:      ["type", "typing", "code", "coding"],
-      sit:       ["sit", "sitting", "seated"],
-      look:      ["look", "lookat", "glance"],
-      nod:       ["nod", "yes", "agree"],
-      shake:     ["shake", "no", "disagree"],
+      sleep:     ["sleep", "sleeping", "snore"],
+      exit:      ["exit", "leave", "disappear"],
+      error:     ["error", "fail", "glitch"],
     };
 
     clips.forEach((clip) => {

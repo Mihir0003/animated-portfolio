@@ -15,10 +15,10 @@ export class CursorController {
   // Configurable weights (influence hierarchy)
   private weights = {
     eyes: 1.0,   // 100%
-    head: 0.9,   // 90%
-    neck: 0.6,   // 60%
-    chest: 0.35, // 35%
-    spine: 0.15, // 15%
+    head: 0.85,  // 85%
+    neck: 0.55,  // 55%
+    chest: 0.25, // 25%
+    spine: 0.1,  // 10%
   };
 
   // Rotation limits in radians (yaw = y-axis, pitch = x-axis)
