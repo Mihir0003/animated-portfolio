@@ -330,6 +330,22 @@ const GLTFCharacterInner: React.FC<{
         bones.leftForeArm = node;
       else if (raw.includes("rightforearm") || raw.includes("forearm_r") || raw.includes("forearmr"))
         bones.rightForeArm = node;
+      
+      // Hips / Pelvis
+      else if (raw.includes("hips") || raw === "hip" || raw.includes("pelvis") || raw.includes("cc_base_hip"))
+        bones.hips = node;
+
+      // Legs (Thighs)
+      else if (raw.includes("leftupleg") || raw.includes("upleg_l") || raw.includes("l_upleg") || raw.includes("thigh_l") || raw.includes("leftthigh") || raw.includes("cc_base_l_thigh"))
+        bones.leftUpLeg = node;
+      else if (raw.includes("rightupleg") || raw.includes("upleg_r") || raw.includes("r_upleg") || raw.includes("thigh_r") || raw.includes("rightthigh") || raw.includes("cc_base_r_thigh"))
+        bones.rightUpLeg = node;
+
+      // Legs (Calves / Knees)
+      else if (raw.includes("leftleg") || raw.includes("leg_l") || raw.includes("l_leg") || raw.includes("shin_l") || raw.includes("leftshin") || raw.includes("cc_base_l_calf"))
+        bones.leftLeg = node;
+      else if (raw.includes("rightleg") || raw.includes("leg_r") || raw.includes("r_leg") || raw.includes("shin_r") || raw.includes("rightshin") || raw.includes("cc_base_r_calf"))
+        bones.rightLeg = node;
     });
 
     if (bones.hips) {
